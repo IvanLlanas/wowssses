@@ -18,5 +18,8 @@ and [Legends-of-Azeroth](https://github.com/Legends-of-Azeroth/Legends-of-Azerot
 ## Installation
 Just clone WoWSSS from [github](https://www.github.com/IvanLlanas/wowssses) whereever you want and launch the `start.sh` or `wowsss.sh` scripts to start the customization process.
 
+## Credits
+I'm using Pratap Panabaka's [ubuntu-gdm-set-background](https://github.com/PRATAP-KUMAR/ubuntu-gdm-set-background) script to set the login background wallpaper. Thanks, Pratap.
+
 ## DISCLAIMER, WARNING and all that
 Use it at your own risk. In fact, if you are not me don't use it. Have fun.
