@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Exec=XXX
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=Conky-WoWSSSES
+Name=Conky-WoWSSSES
+Comment[en_US]=Launch Conky (WoWSSSES)
+Comment=Launch Conky (WoWSSSES)
