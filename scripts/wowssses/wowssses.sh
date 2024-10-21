@@ -33,14 +33,18 @@ _bold1='<b>'
 _bold0='</b>'
 
 # ANSI colors
+# https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
+
 _ansi_off="\e[0m"
 _ansi_black="\e[30m"
 _ansi_red="\e[31m"
 _ansi_blue="\e[34m"
+_ansi_gray="\e[37m"
 
 _ansi_bg_red="\e[41m"
 _ansi_bg_yellow="\e[43m"
 _ansi_bg_white="\e[47m"
+#_ansi_bg_yellow_b="\e[103m"
 
 _ansi_dark_gray="\e[90m"
 _ansi_lime="\e[92m"
@@ -84,21 +88,27 @@ THEME_PREFIX_CATACLYSM=cataclysm
 THEME_NAME_CATACLYSM="Cataclysm"
 # Terminal profiles ID.
 # These ID's are defined in file data/gnome-terminal-profiles.dconf
+# export:$ dconf dump /org/gnome/terminal/legacy/profiles:/ > gnome-terminal-profiles.dconf
 THEME_PROFILE_IVAN=b1dcc9dd-5262-4d8d-a863-c897e6d979b9
 THEME_PROFILE_INAS=b1dcc9dd-5262-4d8d-a863-c897e6d979b9
+THEME_PROFILE_CORVO=aa58db3f-33f6-4648-b758-53e908c81ded
 THEME_PROFILE_VANILLA=9956a6c5-0a18-47f7-8777-ff097f8254c3
 THEME_PROFILE_WOTLK=c88a9988-91de-4767-b381-89adef5b6180
 THEME_PROFILE_CATACLYSM=7bb44f24-9657-4f0a-8f68-06995133b4eb
 
-THEME_NAMES=(     "$THEME_NAME_IVAN"       "$THEME_NAME_INAS"       "$THEME_NAME_VADER"      "$THEME_NAME_VANILLA"    "$THEME_NAME_WOTLK"      "$THEME_NAME_CATACLYSM")
-THEME_PREFIXES=(   $THEME_PREFIX_IVAN       $THEME_PREFIX_INAS       $THEME_PREFIX_VADER      $THEME_PREFIX_VANILLA    $THEME_PREFIX_WOTLK      $THEME_PREFIX_CATACLYSM)
-THEME_COLORS=(    "$_ansi_light_blue"      "$_ansi_lime"            "$_ansi_dark_gray"       "$_ansi_yellow"          "$_ansi_cyan"            "$_ansi_red")
-THEME_DISTRIBS=(  ""                       ""                       ""                       "World of Warcraft Server" "WoW - Wrath of the Lich King Server" "WoW - Cataclysm Server")
-THEME_PROFILES=(  "$THEME_PROFILE_IVAN"    "$THEME_PROFILE_INAS"    "$THEME_PROFILE_VADER"   "$THEME_PROFILE_VANILLA" "$THEME_PROFILE_WOTLK"   "$THEME_PROFILE_CATACLYSM")
-THEME_GTKTHEMES=( "Yaru-blue-dark"         "Yaru-blue-dark"         "Yaru-red-dark"          "Yaru-dark"              "Yaru-blue-dark"         "Yaru-red-dark")
-THEME_ICONTHEMES=("Yaru-blue"              "Yaru-blue"              "Yaru-red"               "Yaru"                   "Yaru-blue"              "Yaru-red")
-S_ICON_NAMES=(    "Ivan Server"            "INAS Server"            "INAS Server"            "WoW Server"             "WotLK Server"            "Cataclysm Server")
-S_ICON_COMMENTS=( "Ivan Server Management" "INAS Server Management" "INAS Server Management" "WoW Server Management"  "WotLK Server Management" "Cataclysm Server Management")
+THEME_NAME_CORVO="Corvo Attano"
+THEME_PREFIX_CORVO="corvo"
+THEME_PROFILE_CORVO
+
+THEME_NAMES=(     "$THEME_NAME_IVAN"       "$THEME_NAME_INAS"       "$THEME_NAME_VADER"      "$THEME_NAME_CORVO"       "$THEME_NAME_VANILLA"      "$THEME_NAME_WOTLK"       "$THEME_NAME_CATACLYSM")
+THEME_PREFIXES=(   $THEME_PREFIX_IVAN       $THEME_PREFIX_INAS       $THEME_PREFIX_VADER      $THEME_PREFIX_CORVO       $THEME_PREFIX_VANILLA      $THEME_PREFIX_WOTLK       $THEME_PREFIX_CATACLYSM)
+THEME_COLORS=(    "$_ansi_light_blue"      "$_ansi_lime"            "$_ansi_dark_gray"       "$_ansi_gray"             "$_ansi_yellow"            "$_ansi_cyan"             "$_ansi_red")
+THEME_DISTRIBS=(  ""                       ""                       ""                       ""                        "World of Warcraft Server" "WoW - Wrath of the Lich King Server"   "WoW - Cataclysm Server")
+THEME_PROFILES=(  "$THEME_PROFILE_IVAN"    "$THEME_PROFILE_INAS"    "$THEME_PROFILE_VADER"   "$THEME_PROFILE_CORVO"    "$THEME_PROFILE_VANILLA"   "$THEME_PROFILE_WOTLK"    "$THEME_PROFILE_CATACLYSM")
+THEME_GTKTHEMES=( "Yaru-blue-dark"         "Yaru-blue-dark"         "Yaru-red-dark"          "Yaru-blue-dark"           "Yaru-dark"                "Yaru-blue-dark"          "Yaru-red-dark")
+THEME_ICONTHEMES=("Yaru-blue"              "Yaru-blue"              "Yaru-red"               "Yaru-blue"                "Yaru"                     "Yaru-blue"               "Yaru-red")
+S_ICON_NAMES=(    "Ivan Server"            "INAS Server"            "Dark Server"            "Corvo Server"            "WoW Server"               "WotLK Server"            "Cataclysm Server")
+S_ICON_COMMENTS=( "Ivan Server Management" "INAS Server Management" "INAS Server Management" "Corvo Server Management" "WoW Server Management"    "WotLK Server Management" "Cataclysm Server Management")
 
 THEME_COUNT=${#THEME_NAMES[@]}
 
@@ -486,45 +496,59 @@ function setup_grub_menu ()
       local filename=/etc/default/grub
       local wp=$var_selected_filename
       local distrib=${THEME_DISTRIBS[$theme_index_current]}
-      backup_file "/etc/default/grub"
+      local buffer=
+      backup_file "$filename"
+
+
+# GRUB_BACKGROUND="wp"
+# GRUB_DISABLE_MEMTEST=true
+# GRUB_DISTRIBUTOR="WoW - WotLK"
+# GRUB_TIMEOUT_STYLE=menu
+# GRUB_TIMEOUT=5
+# GRUB_GFXMODE=640x480
 
 # GRUB_DEFAULT=0
 # GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
 # GRUB_CMDLINE_LINUX=""
-# GRUB_BACKGROUND="wp"
-# GRUB_DISTRIBUTOR="WoW – WotLK"
-# GRUB_TIMEOUT_STYLE=menu
-# GRUB_TIMEOUT=5
-# GRUB_GFXMODE=640x480
-#          sed -i 's/XXXX\s\{0,\}=.*/XXXX='"$variable"/ $filename
+#   sed -i 's/XXXX\s\{0,\}=.*/XXXX='"$variable"/ $filename
 
-      local buffer=$(grep GRUB_BACKGROUND < $filename)
-      backup_file "$filename"
-
+      # GRUB_BACKGROUND="wp" ---------------------------
+      buffer=$(grep GRUB_BACKGROUND < $filename)
       # if no entry for GRUB_BACKGROUND is found let's add a new one.
       if [ "$buffer" == "" ]; then
          sudo bash -c 'echo GRUB_BACKGROUND="'$wp'" >> '$filename
       fi
-
       # Replace / with \/
       wp=${wp//\//\\\/}
-      distrib=${distrib//\//\\\/}
       sudo sed -i 's/#GRUB_BACKGROUND\s\{0,\}=.*/GRUB_BACKGROUND=\"'"$wp"'\"/' $filename
       sudo sed -i 's/GRUB_BACKGROUND\s\{0,\}=.*/GRUB_BACKGROUND=\"'"$wp"'\"/' $filename
 
+      # GRUB_DISABLE_MEMTEST=true ----------------------
+      buffer=$(grep GRUB_DISABLE_MEMTEST < $filename)
+      # if no entry for GRUB_BACKGROUND is found let's add a new one.
+      if [ "$buffer" == "" ]; then
+         sudo bash -c 'echo GRUB_DISABLE_MEMTEST=true >> '$filename
+      fi
+      # else let's leave it as it is.
+
+      # GRUB_DISTRIBUTOR="WoW - WotLK" -----------------
+      # Replace / with \/
+      distrib=${distrib//\//\\\/}
       if [ ! "$distrib" == "" ]; then
          sudo sed -i 's/GRUB_DISTRIBUTOR\s\{0,\}=.*/GRUB_DISTRIBUTOR=\"'"$distrib"'\"/' $filename
       fi
 
+      # GRUB_TIMEOUT_STYLE=menu -----------------------
+      # GRUB_TIMEOUT=5 --------------------------------
       sudo sed -i 's/GRUB_TIMEOUT_STYLE\s\{0,\}=.*/GRUB_TIMEOUT_STYLE=menu/' $filename
       sudo sed -i 's/GRUB_TIMEOUT\s\{0,\}=.*/GRUB_TIMEOUT=5/' $filename
 
+      # GRUB_GFXMODE=640x480 --------------------------
       sudo sed -i 's/#GRUB_GFXMODE\s\{0,\}=.*/GRUB_GFXMODE=640x480/' $filename
       sudo sed -i 's/GRUB_GFXMODE\s\{0,\}=.*/GRUB_GFXMODE=640x480/' $filename
 
-      # At this moment we're not updating /etc/grub.d/05_debian_theme
-      # You must do it manually.
-
+      # At this moment we're not updating /etc/grub.d/05_debian_theme to set colors.
+      # You must do it manually:
       # sudo nano /etc/grub.d/05_debian_theme
 # Colors: red, green, blue, cyan, magenta, brown, light-gray, black
 # Foreground has additional colors available:
@@ -545,6 +569,24 @@ function setup_grub_menu ()
       # fi
       # ...
 
+      # Patch GRUB files to change some strings.
+      confirm 0 "Patch GRUB script for text strings customization"
+      if [ $var_confirmed -gt 0 ]; then
+         print_info "Patching scripts..."
+         # Backup files in /etc/grub.d
+         local grub_dir="/etc/grub.d"
+         local grub_dir_backup="$grub_dir/backup"
+         if [ ! -d "$grub_dir_backup" ]; then
+            sudo mkdir -p "$grub_dir_backup"
+            sudo cp "$grub_dir"/* "$grub_dir_backup"
+         fi
+         print_info "Patching \"Advanced options\" strings..."
+         sudo sed -i 's/\"Advanced options /\"   Advanced options /g' "$grub_dir"/*
+         print_info "Patching distributor strings..."
+         sudo sed -i 's/OS=\"\${GRUB_DISTRIBUTOR} GNU\/Linux\"/OS=\"${GRUB_DISTRIBUTOR}\"/g' "$grub_dir"/10_linux
+      else
+         print_info "Skipping..."
+      fi
       sudo update-grub
    fi
    CR
@@ -827,12 +869,26 @@ function setup_conky ()
       CR
       select_available_filename "$path_conky" "-conky.7z"
       if [ ! -z "$var_selected_filename" ]; then
+
+         # Uncompress the widget.
          print_info "Uncompressing archive..."
          local conky_dir="$HOME/.config/conky"
+         local conky_widget_dir="$conky_dir/${THEME_PREFIXES[$theme_index_current]}"
+         local conky_widget_fonts_dir="$conky_widget_dir/fonts"
+
          mkdir -p "$conky_dir"
          7z x "$var_selected_filename" -y "-o$conky_dir" | sed 's/^/    /'
          CR
-         # xdg-open ~/.../fonts
+
+         # Check if the widget has fonts to install.
+         if [ -d "$conky_widget_fonts_dir" ]; then
+            print_info "Installing fonts..."
+            local local_fonts_dir="$HOME/.local/share/fonts"
+            mkdir -p "$local_fonts_dir"
+            cp "$conky_widget_fonts_dir"/* "$local_fonts_dir"
+         fi
+
+         # Check if Conky itself is installed.
          local package="conky-all"
          local installed=$(_is_package_installed $package)
          if [ $installed = 0 ]; then
@@ -846,19 +902,26 @@ function setup_conky ()
          else
             print_info "Package <b>$package</b> already installed."
          fi
+
+         # If Conky was or has been installed ask for creating an autostart entry.
          if [ ! $installed = 0 ]; then
-            confirm 1 "Autostart <b>Conky</b> on login"
+            local conky_script="$conky_dir/${THEME_PREFIXES[$theme_index_current]}/start-diskio.sh"
+            confirm 1 "<b>Autostart</b> Conky on login"
             if [ $var_confirmed -gt 0 ]; then
-               print_info "Configuring <b>Conky</b>..."
+               print_info "Configuring <b>autostart</b>..."
                local path="$HOME/.config/autostart/"
                mkdir -p $path
                path=$(realpath $path)
                local filename1="$path_conky/wowssses-conky.desktop"
                local filename2="$path/wowssses-conky.desktop"
-               local script="$conky_dir/${THEME_PREFIXES[$theme_index_current]}/start-diskio.sh"
-               script=${script//\//\\\/}
+               local conky_script2=${conky_script//\//\\\/}
                cp "$filename1" "$filename2"
-               sed -i 's/Exec\s\{0,\}=.*/Exec=\/usr\/bin\/bash '"$script"/ $filename2
+               sed -i 's/Exec\s\{0,\}=.*/Exec=\/usr\/bin\/bash '"$conky_script2"/ $filename2
+            fi
+            confirm 1 "Launch the <b>Conky widget</b> now"
+            if [ $var_confirmed -gt 0 ]; then
+               print_info "Launching the <b>Conky widget</b>..."
+               bash "$conky_script"
             fi
          fi
       fi
@@ -910,6 +973,7 @@ function main ()
    setup_conky
 
    print_info "<b>$cons_lit_product_name_short</b> finished."
+   CR
 }
 
 main
