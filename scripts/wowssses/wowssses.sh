@@ -103,7 +103,7 @@ THEME_PROFILE_CORVO
 THEME_NAMES=(     "$THEME_NAME_IVAN"       "$THEME_NAME_INAS"       "$THEME_NAME_VADER"      "$THEME_NAME_CORVO"       "$THEME_NAME_VANILLA"      "$THEME_NAME_WOTLK"       "$THEME_NAME_CATACLYSM")
 THEME_PREFIXES=(   $THEME_PREFIX_IVAN       $THEME_PREFIX_INAS       $THEME_PREFIX_VADER      $THEME_PREFIX_CORVO       $THEME_PREFIX_VANILLA      $THEME_PREFIX_WOTLK       $THEME_PREFIX_CATACLYSM)
 THEME_COLORS=(    "$_ansi_light_blue"      "$_ansi_lime"            "$_ansi_dark_gray"       "$_ansi_gray"             "$_ansi_yellow"            "$_ansi_cyan"             "$_ansi_red")
-THEME_DISTRIBS=(  ""                       ""                       ""                       ""                        "World of Warcraft Server" "WoW - Wrath of the Lich King Server"   "WoW - Cataclysm Server")
+THEME_DISTRIBS=(  "Ivantu"                 "INAS"                   "Death Star"             "Dunwall Tower"                        "World of Warcraft Server" "WoW - Wrath of the Lich King Server"   "WoW - Cataclysm Server")
 THEME_PROFILES=(  "$THEME_PROFILE_IVAN"    "$THEME_PROFILE_INAS"    "$THEME_PROFILE_VADER"   "$THEME_PROFILE_CORVO"    "$THEME_PROFILE_VANILLA"   "$THEME_PROFILE_WOTLK"    "$THEME_PROFILE_CATACLYSM")
 THEME_GTKTHEMES=( "Yaru-blue-dark"         "Yaru-blue-dark"         "Yaru-red-dark"          "Yaru-blue-dark"           "Yaru-dark"                "Yaru-blue-dark"          "Yaru-red-dark")
 THEME_ICONTHEMES=("Yaru-blue"              "Yaru-blue"              "Yaru-red"               "Yaru-blue"                "Yaru"                     "Yaru-blue"               "Yaru-red")
