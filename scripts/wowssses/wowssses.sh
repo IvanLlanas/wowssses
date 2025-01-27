@@ -627,6 +627,11 @@ function setup_boot_logos ()
       local filename=/usr/share/plymouth/themes/bgrt/bgrt.plymouth
       backup_file "$filename"
       sudo sed -i 's/UseFirmwareBackground\s\{0,\}=.*/UseFirmwareBackground=true/' "$filename"
+
+      # All plymouth data and config needs to be embedded inside initramfs to be applied in iso boot,
+      # so you need to apply:
+      print_info "Updating initramfs..."
+      sudo update-initramfs -u
    fi
    CR
 }
