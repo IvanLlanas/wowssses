@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Exec=XXX
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=WoWSSS
+Name=WoWSSS
+Comment[en_US]=Launch WoWSSS
+Comment=Launch WoWSSS

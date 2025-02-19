@@ -86,6 +86,8 @@ THEME_PREFIX_WOTLK=wotlk
 THEME_NAME_WOTLK="Wrath of the Lich King"
 THEME_PREFIX_CATACLYSM=cataclysm
 THEME_NAME_CATACLYSM="Cataclysm"
+THEME_PREFIX_CORVO="corvo"
+THEME_NAME_CORVO="Corvo Attano"
 # Terminal profiles ID.
 # These ID's are defined in file data/gnome-terminal-profiles.dconf
 # export:$ dconf dump /org/gnome/terminal/legacy/profiles:/ > gnome-terminal-profiles.dconf
@@ -95,10 +97,6 @@ THEME_PROFILE_CORVO=aa58db3f-33f6-4648-b758-53e908c81ded
 THEME_PROFILE_VANILLA=9956a6c5-0a18-47f7-8777-ff097f8254c3
 THEME_PROFILE_WOTLK=c88a9988-91de-4767-b381-89adef5b6180
 THEME_PROFILE_CATACLYSM=7bb44f24-9657-4f0a-8f68-06995133b4eb
-
-THEME_NAME_CORVO="Corvo Attano"
-THEME_PREFIX_CORVO="corvo"
-THEME_PROFILE_CORVO
 
 THEME_NAMES=(     "$THEME_NAME_IVAN"       "$THEME_NAME_INAS"       "$THEME_NAME_VADER"      "$THEME_NAME_CORVO"       "$THEME_NAME_VANILLA"      "$THEME_NAME_WOTLK"       "$THEME_NAME_CATACLYSM")
 THEME_PREFIXES=(   $THEME_PREFIX_IVAN       $THEME_PREFIX_INAS       $THEME_PREFIX_VADER      $THEME_PREFIX_CORVO       $THEME_PREFIX_VANILLA      $THEME_PREFIX_WOTLK       $THEME_PREFIX_CATACLYSM)
@@ -823,16 +821,19 @@ function setup_user_icon ()
 }
 
 # ------------------------------------------------------------------------------
-# function setup_dock_icons ()
-# Creates an icon to pin to the dock.
+# function setup_wowss ()
+# Creates a WoWSSS icon to pin to the dock and adds WoWSSS to startup 
+# applications.
 # ------------------------------------------------------------------------------
-function setup_dock_icons ()
+function setup_wowss ()
 {
-   print_title "Setup an <b>icon</b> for the dock"
-   local script="../../../wowsss/scripts/wowsss/wowsss.sh"
+   print_title "Setting up <b>WoWSSS</b>"
+   local script=$(realpath "../../../wowsss/scripts/wowsss/wowsss.sh")
    if [ ! -f "$script" ]; then
       print_warning "<b>WoWSSS</b> installation not found. Skipping..."
    else
+      # WoWSSS dock icon -------------------------------------------------------
+      print_title "Setup an <b>icon</b> for WoWSSS on the dock"
       select_available_filename "$path_icons" "-icon.png"
       if [ ! -z "$var_selected_filename" ]; then
 
@@ -844,20 +845,38 @@ function setup_dock_icons ()
 
          if [ ! "$name" == "" ]; then
             local filename="$path_data/wowsss.desktop"
-            script=$(realpath "$script")
             # Replace / with \/
             name=${name//\//\\\/}
             comment=${comment//\//\\\/}
             icon=${icon//\//\\\/}
-            script=${script//\//\\\/}
+            script2=${script//\//\\\/}
 
-            sed -i 's/Exec\s\{0,\}=.*/Exec=\/usr\/bin\/bash '"$script"/ $filename
+            sed -i 's/Exec\s\{0,\}=.*/Exec=\/usr\/bin\/bash '"$script2"/ $filename
             sed -i 's/Name\s\{0,\}=.*/Name='"$name"/ $filename
             sed -i 's/Comment\s\{0,\}=.*/Comment='"$comment"/ $filename
             sed -i 's/Icon\s\{0,\}=.*/Icon='"$icon"/ $filename
 
             sudo cp $filename /usr/share/applications
          fi
+      fi
+      CR
+
+      # WoWSSS autostart -------------------------------------------------------
+      print_title "<b>Autostart</b> WoWSSS"
+      confirm 0 "<b>Autostart</b> WoWSSS on login"
+      if [ $var_confirmed -gt 0 ]; then
+         local command_line="gnome-terminal --window -- /usr/bin/bash $script"
+         local command_line2=${command_line//\//\\\/}
+
+         print_info "Configuring <b>autostart</b>..."
+         local path="$HOME/.config/autostart/"
+         mkdir -p $path
+         path=$(realpath $path)
+         local filename1="$path_data/wowsss-autostart.desktop"
+         local filename2="$path/wowsss-autostart.desktop"
+
+         cp "$filename1" "$filename2"
+         sed -i 's/Exec\s\{0,\}=.*/Exec='"$command_line2"/ $filename2
       fi
    fi
    CR
@@ -959,7 +978,6 @@ function _is_package_installed ()
 # ------------------------------------------------------------------------------
 function main ()
 {
-   clear
    # We want case-insensitive comparisons.
    shopt -s nocasematch
 
@@ -974,7 +992,7 @@ function main ()
    setup_desktop_appearance
    setup_desktop_wallpaper
    setup_user_icon
-   setup_dock_icons
+   setup_wowss
    setup_conky
 
    print_info "<b>$cons_lit_product_name_short</b> finished."
