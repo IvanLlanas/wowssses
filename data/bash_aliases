@@ -48,7 +48,9 @@ alias wow="~/wowsss/scripts/wowsss/wowsss.sh"
 alias wowe="~/wowssses/scripts/wowssses/wowssses.sh"
 
 # Apps ----------------------------------------------------------
-alias matrix="gnome-terminal --full-screen -- cmatrix -b"
+alias matrix="gnome-terminal --window-with-profile=Matrix --full-screen -- cmatrix -b"
+# kmatrix - Mind the sinle quote!
+alias kmatrix='kill $(pidof cmatrix)'
 
 # Big aliases ---------------------------------------------------
 function ft ()
