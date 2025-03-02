@@ -821,11 +821,11 @@ function setup_user_icon ()
 }
 
 # ------------------------------------------------------------------------------
-# function setup_wowss ()
+# function setup_wowsss ()
 # Creates a WoWSSS icon to pin to the dock and adds WoWSSS to startup 
 # applications.
 # ------------------------------------------------------------------------------
-function setup_wowss ()
+function setup_wowsss ()
 {
    print_title "Setting up <b>WoWSSS</b>"
    local script=$(realpath "../../../wowsss/scripts/wowsss/wowsss.sh")
@@ -878,6 +878,26 @@ function setup_wowss ()
          cp "$filename1" "$filename2"
          sed -i 's/Exec\s\{0,\}=.*/Exec='"$command_line2"/ $filename2
       fi
+   fi
+   CR
+}
+
+# ------------------------------------------------------------------------------
+# function setup_ss ()
+# Creates a WoWSSS icon to pin to the dock and adds WoWSSS to startup 
+# applications.
+# ------------------------------------------------------------------------------
+function setup_ss ()
+{
+   # Screensaver dock icon -----------------------------------------------------
+   print_title "Setup <b>Matrix screensaver</b> icon"
+   confirm 1 "Add a Matrix screensaver icon to dock"
+   if [ $var_confirmed -gt 0 ]; then
+      print_info "Copying <b>Matrix</b> icon..."
+      local filename="$path_data/wowssses-matrix.desktop"
+      sudo cp $filename /usr/share/applications
+   else
+      print_info "Skipping..."
    fi
    CR
 }
@@ -992,7 +1012,8 @@ function main ()
    setup_desktop_appearance
    setup_desktop_wallpaper
    setup_user_icon
-   setup_wowss
+   setup_wowsss
+   setup_ss
    setup_conky
 
    print_info "<b>$cons_lit_product_name_short</b> finished."
