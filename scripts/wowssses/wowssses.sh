@@ -18,8 +18,8 @@
 
 cons_lit_product_name_short="WoWSSSES"
 cons_lit_product_name_long="World of Warcraft Server Script System Environment Setup"
-cons_lit_product_version="2.0"
-cons_lit_product_date="2024-10-19"
+cons_lit_product_version="2.1"
+cons_lit_product_date="2025-07-31"
 
 # Move to the script location.
 cd "$(dirname "$0")"
@@ -52,6 +52,7 @@ _ansi_light_blue="\e[94m"
 _ansi_cyan="\e[96m"
 _ansi_white="\e[97m"
 _ansi_yellow="\e[93m"
+_ansi_orange="\e[33m"
 
 _c_option=$_ansi_white
 _c_default=$_ansi_yellow
@@ -88,6 +89,8 @@ THEME_PREFIX_CATACLYSM=cataclysm
 THEME_NAME_CATACLYSM="Cataclysm"
 THEME_PREFIX_CORVO="corvo"
 THEME_NAME_CORVO="Corvo Attano"
+THEME_PREFIX_ESTATUT="estatut"
+THEME_NAME_ESTATUT="L'Estatut"
 # Terminal profiles ID.
 # These ID's are defined in file data/gnome-terminal-profiles.dconf
 # export:$ dconf dump /org/gnome/terminal/legacy/profiles:/ > gnome-terminal-profiles.dconf
@@ -97,16 +100,17 @@ THEME_PROFILE_CORVO=aa58db3f-33f6-4648-b758-53e908c81ded
 THEME_PROFILE_VANILLA=9956a6c5-0a18-47f7-8777-ff097f8254c3
 THEME_PROFILE_WOTLK=c88a9988-91de-4767-b381-89adef5b6180
 THEME_PROFILE_CATACLYSM=7bb44f24-9657-4f0a-8f68-06995133b4eb
+THEME_PROFILE_ESTATUT=7bb44f24-9657-4f0a-8f68-06995133b4eb
 
-THEME_NAMES=(     "$THEME_NAME_IVAN"       "$THEME_NAME_INAS"       "$THEME_NAME_VADER"      "$THEME_NAME_CORVO"       "$THEME_NAME_VANILLA"      "$THEME_NAME_WOTLK"       "$THEME_NAME_CATACLYSM")
-THEME_PREFIXES=(   $THEME_PREFIX_IVAN       $THEME_PREFIX_INAS       $THEME_PREFIX_VADER      $THEME_PREFIX_CORVO       $THEME_PREFIX_VANILLA      $THEME_PREFIX_WOTLK       $THEME_PREFIX_CATACLYSM)
-THEME_COLORS=(    "$_ansi_light_blue"      "$_ansi_lime"            "$_ansi_dark_gray"       "$_ansi_gray"             "$_ansi_yellow"            "$_ansi_cyan"             "$_ansi_red")
-THEME_DISTRIBS=(  "Ivantu"                 "INAS"                   "Death Star"             "Dunwall Tower"                        "World of Warcraft Server" "WoW - Wrath of the Lich King Server"   "WoW - Cataclysm Server")
-THEME_PROFILES=(  "$THEME_PROFILE_IVAN"    "$THEME_PROFILE_INAS"    "$THEME_PROFILE_VADER"   "$THEME_PROFILE_CORVO"    "$THEME_PROFILE_VANILLA"   "$THEME_PROFILE_WOTLK"    "$THEME_PROFILE_CATACLYSM")
-THEME_GTKTHEMES=( "Yaru-blue-dark"         "Yaru-blue-dark"         "Yaru-red-dark"          "Yaru-blue-dark"           "Yaru-dark"                "Yaru-blue-dark"          "Yaru-red-dark")
-THEME_ICONTHEMES=("Yaru-blue"              "Yaru-blue"              "Yaru-red"               "Yaru-blue"                "Yaru"                     "Yaru-blue"               "Yaru-red")
-S_ICON_NAMES=(    "Ivan Server"            "INAS Server"            "Dark Server"            "Corvo Server"            "WoW Server"               "WotLK Server"            "Cataclysm Server")
-S_ICON_COMMENTS=( "Ivan Server Management" "INAS Server Management" "INAS Server Management" "Corvo Server Management" "WoW Server Management"    "WotLK Server Management" "Cataclysm Server Management")
+THEME_NAMES=(     "$THEME_NAME_IVAN"       "$THEME_NAME_INAS"       "$THEME_NAME_VADER"      "$THEME_NAME_CORVO"       "$THEME_NAME_VANILLA"      "$THEME_NAME_WOTLK"       "$THEME_NAME_CATACLYSM"   "$THEME_NAME_ESTATUT")
+THEME_PREFIXES=(   $THEME_PREFIX_IVAN       $THEME_PREFIX_INAS       $THEME_PREFIX_VADER      $THEME_PREFIX_CORVO       $THEME_PREFIX_VANILLA      $THEME_PREFIX_WOTLK       $THEME_PREFIX_CATACLYSM   $THEME_PREFIX_ESTATUT)
+THEME_COLORS=(    "$_ansi_light_blue"      "$_ansi_lime"            "$_ansi_dark_gray"       "$_ansi_gray"             "$_ansi_yellow"            "$_ansi_cyan"             "$_ansi_red"              "$_ansi_orange")
+THEME_DISTRIBS=(  "Ivantu"                 "INAS"                   "Death Star"             "Dunwall Tower"                        "World of Warcraft Server" "WoW - Wrath of the Lich King Server"   "WoW - Cataclysm Server"  "L'Estatut")
+THEME_PROFILES=(  "$THEME_PROFILE_IVAN"    "$THEME_PROFILE_INAS"    "$THEME_PROFILE_VADER"   "$THEME_PROFILE_CORVO"    "$THEME_PROFILE_VANILLA"   "$THEME_PROFILE_WOTLK"    "$THEME_PROFILE_CATACLYSM" "$THEME_PROFILE_ESTATUT")
+THEME_GTKTHEMES=( "Yaru-blue-dark"         "Yaru-blue-dark"         "Yaru-red-dark"          "Yaru-blue-dark"           "Yaru-dark"                "Yaru-blue-dark"          "Yaru-red-dark"           "Yaru-yellow-dark")
+THEME_ICONTHEMES=("Yaru-blue"              "Yaru-blue"              "Yaru-red"               "Yaru-blue"                "Yaru"                     "Yaru-blue"               "Yaru-red"                "Yaru-yellow")
+S_ICON_NAMES=(    "Ivan Server"            "INAS Server"            "Dark Server"            "Corvo Server"             "WoW Server"               "WotLK Server"            "Cataclysm Server"        "L'Estatut Server")
+S_ICON_COMMENTS=( "Ivan Server Management" "INAS Server Management" "INAS Server Management" "Corvo Server Management" "WoW Server Management"    "WotLK Server Management" "Cataclysm Server Management" "L'Estatut Server Management")
 
 THEME_COUNT=${#THEME_NAMES[@]}
 
