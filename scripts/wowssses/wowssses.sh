@@ -729,76 +729,6 @@ function setup_terminal_profiles ()
 }
 
 # ------------------------------------------------------------------------------
-# function setup_eza ()
-# Installs eza and/or a theme file.
-# ------------------------------------------------------------------------------
-function setup_eza ()
-{
-   print_title "Install <b>eza</b> theme"
-
-   # Check if eza is installed.
-   local package="eza"
-   local installed=$(_is_package_installed $package)
-   if [ $installed = 0 ]; then
-      print_warning "<b>eza</b> is not installed."
-      confirm 1 "Install <b>eza</b> package"
-      if [ $var_confirmed -gt 0 ]; then
-         print_info "Installing <b>eza</b>..."
-         sudo apt install -y $package | sed 's/^/    /'
-         installed=1
-      fi
-   fi
-
-   if [ $installed -gt 0 ]; then
-      confirm 1 "Install customized <b>eza</b> theme"
-      if [ $var_confirmed -gt 0 ]; then
-         local path="~/.config/eza"
-         print_info "Copying <b>eza theme</b>..."
-         mkdir -p $path
-         cp $path_data/theme.yml $path
-      else
-         print_info $skipping_
-      fi
-   fi
-   CR
-}
-
-# ------------------------------------------------------------------------------
-# function setup_geany ()
-# Installs geany and/or themes and settings.
-# ------------------------------------------------------------------------------
-function setup_geany ()
-{
-   print_title "Install <b>geany</b> settings"
-
-   # Check if eza is installed.
-   local package="geany"
-   local installed=$(_is_package_installed $package)
-   if [ $installed = 0 ]; then
-      print_warning "<b>geany</b> is not installed."
-      confirm 1 "Install <b>geany</b> package"
-      if [ $var_confirmed -gt 0 ]; then
-         print_info "Installing <b>geany</b>..."
-         sudo apt install -y $package | sed 's/^/    /'
-         installed=1
-      fi
-   fi
-
-   if [ $installed -gt 0 ]; then
-      confirm 1 "Install <b>geany</b> settings"
-      if [ $var_confirmed -gt 0 ]; then
-         local path="~/.config/geany"
-         print_info "Installing <b>geany</b> settings..."
-         mkdir -p $path
-         7z x $path_data/geany-config.7z -y "-o$path" | sed 's/^/    /'
-      else
-         print_info $skipping_
-      fi
-   fi
-   CR
-}
-
-# ------------------------------------------------------------------------------
 # function setup_desktop_appearance ()
 # Sets some GUI components and colors.
 # ------------------------------------------------------------------------------
@@ -970,13 +900,34 @@ function setup_ss ()
 {
    # Screensaver dock icon -----------------------------------------------------
    print_title "Setup <b>Matrix screensaver</b> icon"
-   confirm 1 "Add a Matrix screensaver icon to dock"
-   if [ $var_confirmed -gt 0 ]; then
-      print_info "Copying <b>Matrix</b> icon..."
-      local filename="$path_data/wowssses-matrix.desktop"
-      sudo cp $filename /usr/share/applications
-   else
-      print_info $skipping_
+   # Check if cmatrix is installed.
+   local package="cmatrix"
+   local installed=$(_is_package_installed $package)
+   local installed_now=0
+   if [ $installed = 0 ]; then
+      print_warning "<b>$package</b> is not installed."
+      confirm 1 "Install <b>$package</b> package"
+      if [ $var_confirmed -gt 0 ]; then
+         print_info "Installing <b>$package</b>..."
+         sudo apt install -y $package | sed 's/^/    /'
+         installed=1
+         installed_now=1
+      fi
+   fi
+
+   if [ $installed -gt 0 ]; then
+      if [ $installed_now -gt 0 ]; then
+         var_confirmed=1
+      else
+         confirm 1 "Add a <b>Matrix</b> screensaver icon to dock"
+      fi
+      if [ $var_confirmed -gt 0 ]; then
+         print_info "Copying <b>Matrix</b> icon..."
+         local filename="$path_data/wowssses-matrix.desktop"
+         sudo cp $filename /usr/share/applications
+      else
+         print_info $skipping_
+      fi
    fi
    CR
 }
@@ -987,69 +938,181 @@ function setup_ss ()
 function setup_conky ()
 {
    print_title "Setup <b>Conky</b> widget"
-   confirm 1 "Install <b>Conky</b> widget"
-   if [ $var_confirmed -gt 0 ]; then
-      CR
-      select_available_filename "$path_conky" "-conky.7z"
-      if [ ! -z "$var_selected_filename" ]; then
-
-         # Uncompress the widget.
-         print_info "Uncompressing archive..."
-         local conky_dir="$HOME/.config/conky"
-         local conky_widget_dir="$conky_dir/${THEME_PREFIXES[$theme_index_current]}"
-         local conky_widget_fonts_dir="$conky_widget_dir/fonts"
-
-         mkdir -p "$conky_dir"
-         7z x "$var_selected_filename" -y "-o$conky_dir" | sed 's/^/    /'
-         CR
-
-         # Check if the widget has fonts to install.
-         if [ -d "$conky_widget_fonts_dir" ]; then
-            print_info "Installing fonts..."
-            local local_fonts_dir="$HOME/.local/share/fonts"
-            mkdir -p "$local_fonts_dir"
-            cp "$conky_widget_fonts_dir"/* "$local_fonts_dir"
-         fi
-
-         # Check if Conky itself is installed.
-         local package="conky-all"
-         local installed=$(_is_package_installed $package)
-         if [ $installed = 0 ]; then
-            print_warning "<b>Conky</b> is not installed."
-            confirm 1 "Install <b>Conky</b> package"
-            if [ $var_confirmed -gt 0 ]; then
-               print_info "Installing <b>Conky</b>..."
-               sudo apt install -y $package | sed 's/^/    /'
-               installed=1
-            fi
-         else
-            print_info "Package <b>$package</b> already installed."
-         fi
-
-         # If Conky was or has been installed ask for creating an autostart entry.
-         if [ ! $installed = 0 ]; then
-            local conky_script="$conky_dir/${THEME_PREFIXES[$theme_index_current]}/start-diskio.sh"
-            confirm 1 "<b>Autostart</b> Conky on login"
-            if [ $var_confirmed -gt 0 ]; then
-               print_info "Configuring <b>autostart</b>..."
-               local path="$HOME/.config/autostart/"
-               mkdir -p $path
-               path=$(realpath $path)
-               local filename1="$path_conky/wowssses-conky.desktop"
-               local filename2="$path/wowssses-conky.desktop"
-               local conky_script2=${conky_script//\//\\\/}
-               cp "$filename1" "$filename2"
-               sed -i 's/Exec\s\{0,\}=.*/Exec=\/usr\/bin\/bash '"$conky_script2"/ $filename2
-            fi
-            confirm 1 "Launch the <b>Conky widget</b> now"
-            if [ $var_confirmed -gt 0 ]; then
-               print_info "Launching the <b>Conky widget</b>..."
-               bash "$conky_script"
-            fi
-         fi
+   # Check if conky-all is installed.
+   local package="conky-all"
+   local installed=$(_is_package_installed $package)
+   local installed_now=0
+   if [ $installed = 0 ]; then
+      print_warning "<b>$package</b> is not installed."
+      confirm 1 "Install <b>$package</b> package"
+      if [ $var_confirmed -gt 0 ]; then
+         print_info "Installing <b>$package</b>..."
+         sudo apt install -y $package | sed 's/^/    /'
+         installed=1
+         installed_now=1
       fi
-   else
-      print_info $skipping_
+   fi
+
+
+
+
+   if [ $installed -gt 0 ]; then
+      if [ $installed_now -gt 0 ]; then
+         var_confirmed=1
+      else
+         confirm 1 "Install themed <b>Conky</b> widget"
+      fi
+      if [ $var_confirmed -gt 0 ]; then
+
+
+
+               CR
+               select_available_filename "$path_conky" "-conky.7z"
+               if [ ! -z "$var_selected_filename" ]; then
+
+                  # Uncompress the widget.
+                  print_info "Uncompressing archive..."
+                  local conky_dir="$HOME/.config/conky"
+                  local conky_widget_dir="$conky_dir/${THEME_PREFIXES[$theme_index_current]}"
+                  local conky_widget_fonts_dir="$conky_widget_dir/fonts"
+
+                  mkdir -p "$conky_dir"
+                  7z x "$var_selected_filename" -y "-o$conky_dir" | sed 's/^/    /'
+                  CR
+
+                  # Check if the widget has fonts to install.
+                  if [ -d "$conky_widget_fonts_dir" ]; then
+                     print_info "Installing fonts..."
+                     local local_fonts_dir="$HOME/.local/share/fonts"
+                     mkdir -p "$local_fonts_dir"
+                     cp "$conky_widget_fonts_dir"/* "$local_fonts_dir"
+                  fi
+
+                  # Check if Conky itself is installed.
+                  local package="conky-all"
+                  local installed=$(_is_package_installed $package)
+                  if [ $installed = 0 ]; then
+                     print_warning "<b>Conky</b> is not installed."
+                     confirm 1 "Install <b>Conky</b> package"
+                     if [ $var_confirmed -gt 0 ]; then
+                        print_info "Installing <b>Conky</b>..."
+                        sudo apt install -y $package | sed 's/^/    /'
+                        installed=1
+                     fi
+                  else
+                     print_info "Package <b>$package</b> already installed."
+                  fi
+
+                  # If Conky was or has been installed ask for creating an autostart entry.
+                  if [ ! $installed = 0 ]; then
+                     local conky_script="$conky_dir/${THEME_PREFIXES[$theme_index_current]}/start-diskio.sh"
+                     confirm 1 "<b>Autostart</b> Conky on login"
+                     if [ $var_confirmed -gt 0 ]; then
+                        print_info "Configuring <b>autostart</b>..."
+                        local path="$HOME/.config/autostart/"
+                        mkdir -p $path
+                        path=$(realpath $path)
+                        local filename1="$path_conky/wowssses-conky.desktop"
+                        local filename2="$path/wowssses-conky.desktop"
+                        local conky_script2=${conky_script//\//\\\/}
+                        cp "$filename1" "$filename2"
+                        sed -i 's/Exec\s\{0,\}=.*/Exec=\/usr\/bin\/bash '"$conky_script2"/ $filename2
+                     fi
+                     confirm 1 "Launch the <b>Conky widget</b> now"
+                     if [ $var_confirmed -gt 0 ]; then
+                        print_info "Launching the <b>Conky widget</b>..."
+                        bash "$conky_script"
+                     fi
+                  fi
+               fi
+
+      else
+         print_info $skipping_
+      fi
+   fi
+   CR
+}
+
+# ------------------------------------------------------------------------------
+# function setup_eza ()
+# Installs eza and/or a theme file.
+# ------------------------------------------------------------------------------
+function setup_eza ()
+{
+   print_title "Install <b>eza</b> theme"
+
+   # Check if eza is installed.
+   local package="eza"
+   local installed=$(_is_package_installed $package)
+   local installed_now=0
+   if [ $installed = 0 ]; then
+      print_warning "<b>$package</b> is not installed."
+      confirm 1 "Install <b>$package</b> package"
+      if [ $var_confirmed -gt 0 ]; then
+         print_info "Installing <b>$package</b>..."
+         sudo apt install -y $package | sed 's/^/    /'
+         installed=1
+         installed_now=1
+      fi
+   fi
+
+   if [ $installed -gt 0 ]; then
+      if [ $installed_now -gt 0 ]; then
+         var_confirmed=1
+      else
+         confirm 1 "Install customized <b>$package</b> theme"
+      fi
+
+      if [ $var_confirmed -gt 0 ]; then
+         local path="~/.config/eza"
+         print_info "Copying <b>$package theme</b>..."
+         mkdir -p $path
+         cp $path_data/theme.yml $path
+      else
+         print_info $skipping_
+      fi
+   fi
+   CR
+}
+
+# ------------------------------------------------------------------------------
+# function setup_geany ()
+# Installs geany and/or themes and settings.
+# ------------------------------------------------------------------------------
+function setup_geany ()
+{
+   print_title "Install <b>geany</b> settings"
+
+   # Check if eza is installed.
+   local package="geany"
+   local installed=$(_is_package_installed $package)
+   local installed_now=0
+   if [ $installed = 0 ]; then
+      print_warning "<b>geany</b> is not installed."
+      confirm 1 "Install <b>geany</b> package"
+      if [ $var_confirmed -gt 0 ]; then
+         print_info "Installing <b>geany</b>..."
+         sudo apt install -y $package | sed 's/^/    /'
+         installed=1
+         installed_now=1
+      fi
+   fi
+
+   if [ $installed -gt 0 ]; then
+      if [ $installed_now -gt 0 ]; then
+         var_confirmed=1
+      else
+         confirm 1 "Install <b>geany</b> settings"
+      fi
+
+      if [ $var_confirmed -gt 0 ]; then
+         local path="~/.config/geany"
+         print_info "Installing <b>geany</b> settings..."
+         mkdir -p $path
+         7z x $path_data/geany-config.7z -y "-o$path" | sed 's/^/    /'
+      else
+         print_info $skipping_
+      fi
    fi
    CR
 }
@@ -1096,7 +1159,7 @@ function check_installer_packages ()
    _warning_package geany 0
    _warning_package cmatrix 0
    _warning_package conky-all 0
-   _warning_package p7zip-full 1 "This package IS required for some of the installations."
+   _warning_package p7zip-full 1 "This package IS required for some of the installations. You should install it first."
 }
 
 # ------------------------------------------------------------------------------
