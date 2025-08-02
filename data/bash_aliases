@@ -1,4 +1,5 @@
 #export LC_ALL="C" # Breaks unicode characters!
+export LS_COLORS=""
 
 alias fr=fr-normal
 
@@ -8,15 +9,23 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias x="exit"
 alias c="clear"
-alias d="ls -l --group-directories-first"
-alias da="ls -la --group-directories-first"
+#alias ls0="ls --group-directories-first"
+# --no-user --no-permissions
+alias ls0="eza --group-directories-first --header --time-style=\"+%Y.%m.%d %H:%M\""
+# more information
+alias d="ls0 -l"
+# more information and all files
+alias da="ls0 -la"
+# more information and git status
+alias dg="d --git"
 alias l="less"
-alias q=nano
+alias q=geany
 alias sq="sudo nano"
 alias ea="q ~/.bash_aliases"
 alias ra="source ~/.bash_aliases"
 
-alias fm="xdg-open ."
+alias start="xdg-open"
+alias fm="start ."
 alias bk="rm *.bak"
 alias 7za="7z a -t7z -mx=9"
 alias sysupdate="sudo apt update && sudo apt upgrade -y"
@@ -27,8 +36,9 @@ alias linkto='function _linktof_(){ ln -s "$(realpath $1)" "$HOME/Desktop/$2"; }
 alias fstab="sudo nano /etc/fstab"
 alias mnt="sudo mount -a"
 
-alias kk="conky -c /home/ivan/.config/conky/inas/inas-diskio.conf"
+#alias kk="conky -c /home/ivan/.config/conky/inas/inas-diskio.conf"
 alias logout=gnome-session-quit
+
 # Mistakes ------------------------------------------------------
 alias car=cat
 alias cay=cat
@@ -49,13 +59,19 @@ alias wowe="~/wowssses/scripts/wowssses/wowssses.sh"
 
 # Apps ----------------------------------------------------------
 alias matrix="gnome-terminal --window-with-profile=Matrix --full-screen -- cmatrix -b"
-# kmatrix - Mind the sinle quote!
+# kmatrix - Mind the single quote!
 alias kmatrix='kill $(pidof cmatrix)'
+
+# Add an "alert" alias for long running commands.  Use like so:
+#   sleep 10; alert
+# and in 10sec an alert will popup into Gnome alerts (calendar button).
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 # Big aliases ---------------------------------------------------
 function ft ()
 {
    if [ $# -lt 1 ]; then
+      echo "ft - Finds text inside files (ignore case, recursive and line numbers)."
       echo "Usage: ft text [path]"
    else
       local text=$1

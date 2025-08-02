@@ -4,10 +4,10 @@
 #    \   \/\/  /  _ \  \/\/   /____  \_____  \_____  \   ___/______  \
 #     \       (  (_) )       /        \       \       \       \       \
 #      \__/\  /\____/\__/\  /_______  /_____  /_____  /_____  /_____  /
-#           \/            \/        \/      \/      \/      \/      \/ 2.0
+#           \/            \/        \/      \/      \/      \/      \/ 2.2
 # ------------------------------------------------------------------------------
 # World of Warcraft Server Script System Environment Setup
-# (C) Copyright by Ivan Llanas, 2023-24
+# (C) Copyright by Ivan Llanas, 2023-25
 # ------------------------------------------------------------------------------
 # This script configures some of MY preferences and configurations
 # for an Ubuntu system with a GNOME 46+ desktop.
@@ -18,8 +18,8 @@
 
 cons_lit_product_name_short="WoWSSSES"
 cons_lit_product_name_long="World of Warcraft Server Script System Environment Setup"
-cons_lit_product_version="2.1"
-cons_lit_product_date="2025-07-31"
+cons_lit_product_version="2.2"
+cons_lit_product_date="2025-08-02"
 
 # Move to the script location.
 cd "$(dirname "$0")"
@@ -122,6 +122,9 @@ theme_color=
 
 # Temporary selected theme index (select_available_filename)
 theme_index_current=
+
+# ------------------------------------------------------------------------------
+skipping_="Skipping..."
 
 # ------------------------------------------------------------------------------
 # function backup_file (filename)
@@ -360,7 +363,7 @@ function show_warning_message ()
    print_centered "\   \\/\\/  /  _ \  \\/\\/   /____  \\_____  \\_____  \\   ___/______  \\    " " " $_ansi_cyan
    print_centered " \       (  (_) )       /        \\       \\       \\       \\       \\   " " " $_ansi_light_blue
    print_centered "  \\__/\\  /\\____/\\__/\\  /_______  /_____  /_____  /_____  /_____  /   " " " $_ansi_light_blue
-   print_centered "       \\/            \\/        \\/      \\/      \\/      \\/      \\/ 2.0" " " $_ansi_blue
+   print_centered "       \\/            \\/        \\/      \\/      \\/      \\/      \\/ $cons_lit_product_version" " " $_ansi_blue
    CR
    print_centered "[ <b>WoWSSS Environment Setup</b> ]"                                  "-" $c_normal $c_bold $c_bg
    print_fw " This script configures some of <b>MY</b> preferences and configurations"   " " $c_normal $c_bold $c_bg
@@ -368,6 +371,8 @@ function show_warning_message ()
    print_fw ""                                                                           " " $c_normal $c_bold $c_bg
    print_fw " Do not run this unless you are me or you are sure you want these changes." " " $c_normal $c_bold $c_bg
    print_fw ""                                                                           "-" $c_normal $c_bold $c_bg
+   CR
+   check_installer_packages
    CR
 
    confirm 0 "Do you want to continue"
@@ -464,7 +469,7 @@ function select_available_filename ()
    var_selected_filename=
 
    if [[ $var_answer = "N" ]]; then
-      print_info "Skipping..."
+      print_info $skipping_
       return
    elif [ -z $var_answer ] || [ $var_answer = "0" ] ; then
       theme_index_current=$theme_index
@@ -472,7 +477,7 @@ function select_available_filename ()
    elif [ $var_answer -ge 1 ] && [ $var_answer -le $THEME_COUNT ]; then
       let "theme_index_current=var_answer-1"
    else
-      print_error "Invalid option. Skipping..."
+      print_error "Invalid option. "$skipping_
       return
    fi
 
@@ -587,7 +592,7 @@ function setup_grub_menu ()
          print_info "Patching distributor strings..."
          sudo sed -i 's/OS=\"\${GRUB_DISTRIBUTOR} GNU\/Linux\"/OS=\"${GRUB_DISTRIBUTOR}\"/g' "$grub_dir"/10_linux
       else
-         print_info "Skipping..."
+         print_info $skipping_
       fi
       sudo update-grub
    fi
@@ -665,7 +670,7 @@ function setup_keyboard_options ()
       print_info "Applying config..."
       sudo sed -i 's/\(^XKBOPTIONS=\).*/\1\"numpad:microsoft\"/' /etc/default/keyboard
    else
-      print_info "Skipping..."
+      print_info $skipping_
    fi
    CR
 }
@@ -688,7 +693,7 @@ function setup_startup_configuration_files ()
       print_info "Copying <b>/root/.nanorc</b>..."
       sudo cp $path_data/nanorc /root/.nanorc
    else
-      print_info "Skipping..."
+      print_info $skipping_
    fi
    CR
 }
@@ -718,7 +723,77 @@ function setup_terminal_profiles ()
          dconf load /org/gnome/terminal/legacy/profiles:/ < $filename
       fi
    else
-      print_info "Skipping..."
+      print_info $skipping_
+   fi
+   CR
+}
+
+# ------------------------------------------------------------------------------
+# function setup_eza ()
+# Installs eza and/or a theme file.
+# ------------------------------------------------------------------------------
+function setup_eza ()
+{
+   print_title "Install <b>eza</b> theme"
+
+   # Check if eza is installed.
+   local package="eza"
+   local installed=$(_is_package_installed $package)
+   if [ $installed = 0 ]; then
+      print_warning "<b>eza</b> is not installed."
+      confirm 1 "Install <b>eza</b> package"
+      if [ $var_confirmed -gt 0 ]; then
+         print_info "Installing <b>eza</b>..."
+         sudo apt install -y $package | sed 's/^/    /'
+         installed=1
+      fi
+   fi
+
+   if [ $installed -gt 0 ]; then
+      confirm 1 "Install customized <b>eza</b> theme"
+      if [ $var_confirmed -gt 0 ]; then
+         local path="~/.config/eza"
+         print_info "Copying <b>eza theme</b>..."
+         mkdir -p $path
+         cp $path_data/theme.yml $path
+      else
+         print_info $skipping_
+      fi
+   fi
+   CR
+}
+
+# ------------------------------------------------------------------------------
+# function setup_geany ()
+# Installs geany and/or themes and settings.
+# ------------------------------------------------------------------------------
+function setup_geany ()
+{
+   print_title "Install <b>geany</b> settings"
+
+   # Check if eza is installed.
+   local package="geany"
+   local installed=$(_is_package_installed $package)
+   if [ $installed = 0 ]; then
+      print_warning "<b>geany</b> is not installed."
+      confirm 1 "Install <b>geany</b> package"
+      if [ $var_confirmed -gt 0 ]; then
+         print_info "Installing <b>geany</b>..."
+         sudo apt install -y $package | sed 's/^/    /'
+         installed=1
+      fi
+   fi
+
+   if [ $installed -gt 0 ]; then
+      confirm 1 "Install <b>geany</b> settings"
+      if [ $var_confirmed -gt 0 ]; then
+         local path="~/.config/geany"
+         print_info "Installing <b>geany</b> settings..."
+         mkdir -p $path
+         7z x $path_data/geany-config.7z -y "-o$path" | sed 's/^/    /'
+      else
+         print_info $skipping_
+      fi
    fi
    CR
 }
@@ -756,7 +831,7 @@ function setup_desktop_appearance ()
       print_info "Setting mouse pointer size..."
       gsettings set org.gnome.desktop.interface cursor-size 48
    else
-      print_info "Skipping..."
+      print_info $skipping_
    fi
    CR
 }
@@ -826,7 +901,7 @@ function setup_user_icon ()
 
 # ------------------------------------------------------------------------------
 # function setup_wowsss ()
-# Creates a WoWSSS icon to pin to the dock and adds WoWSSS to startup 
+# Creates a WoWSSS icon to pin to the dock and adds WoWSSS to startup
 # applications.
 # ------------------------------------------------------------------------------
 function setup_wowsss ()
@@ -834,7 +909,7 @@ function setup_wowsss ()
    print_title "Setting up <b>WoWSSS</b>"
    local script=$(realpath "../../../wowsss/scripts/wowsss/wowsss.sh")
    if [ ! -f "$script" ]; then
-      print_warning "<b>WoWSSS</b> installation not found. Skipping..."
+      print_warning "<b>WoWSSS</b> installation not found. "$skipping_
    else
       # WoWSSS dock icon -------------------------------------------------------
       print_title "Setup an <b>icon</b> for WoWSSS on the dock"
@@ -888,7 +963,7 @@ function setup_wowsss ()
 
 # ------------------------------------------------------------------------------
 # function setup_ss ()
-# Creates a WoWSSS icon to pin to the dock and adds WoWSSS to startup 
+# Creates a WoWSSS icon to pin to the dock and adds WoWSSS to startup
 # applications.
 # ------------------------------------------------------------------------------
 function setup_ss ()
@@ -901,7 +976,7 @@ function setup_ss ()
       local filename="$path_data/wowssses-matrix.desktop"
       sudo cp $filename /usr/share/applications
    else
-      print_info "Skipping..."
+      print_info $skipping_
    fi
    CR
 }
@@ -974,7 +1049,7 @@ function setup_conky ()
          fi
       fi
    else
-      print_info "Skipping..."
+      print_info $skipping_
    fi
    CR
 }
@@ -998,6 +1073,33 @@ function _is_package_installed ()
 }
 
 # ------------------------------------------------------------------------------
+function _warning_package ()
+{
+   local package=$1
+   local critical=$2
+   local additional_message=$3
+   local installed=$(_is_package_installed $package)
+   if [ $installed = 0 ]; then
+      local big_message=" WARNING: <b>$package</b> is not installed. "$additional_message
+      if [ $critical -gt 0 ]; then
+         print_error $big_message
+      else
+         print_warning $big_message
+      fi
+   fi
+}
+
+# ------------------------------------------------------------------------------
+function check_installer_packages ()
+{
+   _warning_package eza 0
+   _warning_package geany 0
+   _warning_package cmatrix 0
+   _warning_package conky-all 0
+   _warning_package p7zip-full 1 "This package IS required for some of the installations."
+}
+
+# ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 function main ()
@@ -1018,6 +1120,8 @@ function main ()
    setup_user_icon
    setup_wowsss
    setup_ss
+   setup_eza
+   setup_geany
    setup_conky
 
    print_info "<b>$cons_lit_product_name_short</b> finished."
