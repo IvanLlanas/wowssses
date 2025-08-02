@@ -99,23 +99,34 @@ users:
      foreground: "#ff8000"
 
 links:
-  normal: { foreground: "#89ddff" }
-  multi_link_file: { foreground: "#2ac3de" }
+  normal: { foreground: "#ff00ff" }
+  multi_link_file: { foreground: "#ff00ff" }
 
 git:
-  new: { foreground: "#9ece6a" }
-  modified: { foreground: "#bb9af7" }
-  deleted: { foreground: "#db4b4b" }
-  renamed: { foreground: "#2ac3de" }
-  typechange: { foreground: "#2ac3de" }
-  ignored: { foreground: "#545c7e" }
-  conflicted: { foreground: "#ff9e64" }
+  new:
+     foreground: "#9ece6a"
+  modified:
+     foreground: "#bb9af7"
+  deleted:
+     foreground: "#db4b4b"
+  renamed:
+     foreground: "#2ac3de"
+  typechange:
+     foreground: "#2ac3de"
+  ignored:
+     foreground: "#545c7e"
+  conflicted:
+     foreground: "#ff9e64"
 
 git_repo:
-  branch_main: { foreground: "#737aa2" }
-  branch_other: { foreground: "#b4f9f8" }
-  git_clean: { foreground: "#292e42" }
-  git_dirty: { foreground: "#bb9af7" }
+  branch_main:
+     foreground: "#737aa2"
+  branch_other:
+     foreground: "#b4f9f8"
+  git_clean:
+     foreground: "#292e42"
+  git_dirty:
+     foreground: "#bb9af7"
 
 security_context:
   colon: { foreground: "#545c7e" }
@@ -162,10 +173,11 @@ file_type:
 
 punctuation:
    foreground: "#808080"
-date: { foreground: "#e0af68" }
+date: 
+   foreground: "#e0af68"
 inode:
    foreground: "#c0c0f0"
-blocks: { foreground: "#737aa2" }
+blocks: { foreground: "#ff00ff" }
 header: 
    foreground: "#c0c0f0"
 octal: { foreground: "#ff9e64" }
