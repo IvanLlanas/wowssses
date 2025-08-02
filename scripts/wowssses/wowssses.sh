@@ -692,6 +692,19 @@ function setup_startup_configuration_files ()
       cp $path_data/nanorc ~/.nanorc
       print_info "Copying <b>/root/.nanorc</b>..."
       sudo cp $path_data/nanorc /root/.nanorc
+
+      # Check if fastfetch is installed.
+      local package="fastfetch"
+      local installed=$(_is_package_installed $package)
+      if [ $installed = 0 ]; then
+         print_warning "<b>$package</b> is not installed."
+         confirm 1 "Install <b>$package</b> package"
+         if [ $var_confirmed -gt 0 ]; then
+            print_info "Installing <b>$package</b>..."
+            sudo apt install -y $package | sed 's/^/    /'
+            installed=1
+         fi
+      fi
    else
       print_info $skipping_
    fi
@@ -1159,6 +1172,7 @@ function check_installer_packages ()
    _warning_package geany 0
    _warning_package cmatrix 0
    _warning_package conky-all 0
+   _warning_package fastfetch 0
    _warning_package p7zip-full 1 "This package IS required for some of the installations. You should install it first."
 }
 
