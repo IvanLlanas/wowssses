@@ -108,7 +108,7 @@ THEME_COLORS=(    "$_ansi_light_blue"      "$_ansi_lime"            "$_ansi_dark
 THEME_DISTRIBS=(  "Ivantu"                 "INAS"                   "Death Star"             "Dunwall Tower"                        "World of Warcraft Server" "WoW - Wrath of the Lich King Server"   "WoW - Cataclysm Server"  "L'Estatut")
 THEME_PROFILES=(  "$THEME_PROFILE_IVAN"    "$THEME_PROFILE_INAS"    "$THEME_PROFILE_VADER"   "$THEME_PROFILE_CORVO"    "$THEME_PROFILE_VANILLA"   "$THEME_PROFILE_WOTLK"    "$THEME_PROFILE_CATACLYSM" "$THEME_PROFILE_ESTATUT")
 THEME_GTKTHEMES=( "Yaru-blue-dark"         "Yaru-blue-dark"         "Yaru-red-dark"          "Yaru-blue-dark"           "Yaru-dark"                "Yaru-blue-dark"          "Yaru-red-dark"           "Yaru-yellow-dark")
-THEME_ICONTHEMES=("Yaru-blue"              "Yaru-blue"              "Yaru-red"               "Yaru-blue"                "Yaru"                     "Yaru-blue"               "Yaru-red"                "Yaru-yellow")
+THEME_ICONTHEMES=("Yaru-blue"              "Yaru-blue"              "Yaru-red"               "Yaru-blue"                "Yaru"                     "Yaru-blue"               "Yaru-red"                "Yaru-yellow-dark")
 S_ICON_NAMES=(    "Ivan Server"            "INAS Server"            "Dark Server"            "Corvo Server"             "WoW Server"               "WotLK Server"            "Cataclysm Server"        "L'Estatut Server")
 S_ICON_COMMENTS=( "Ivan Server Management" "INAS Server Management" "INAS Server Management" "Corvo Server Management" "WoW Server Management"    "WotLK Server Management" "Cataclysm Server Management" "L'Estatut Server Management")
 
