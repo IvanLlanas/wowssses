@@ -966,9 +966,6 @@ function setup_conky ()
       fi
    fi
 
-
-
-
    if [ $installed -gt 0 ]; then
       if [ $installed_now -gt 0 ]; then
          var_confirmed=1
@@ -977,67 +974,65 @@ function setup_conky ()
       fi
       if [ $var_confirmed -gt 0 ]; then
 
+         CR
+         select_available_filename "$path_conky" "-conky.7z"
+         if [ ! -z "$var_selected_filename" ]; then
 
+            # Uncompress the widget.
+            print_info "Uncompressing archive..."
+            local conky_dir="$HOME/.config/conky"
+            local conky_widget_dir="$conky_dir/${THEME_PREFIXES[$theme_index_current]}"
+            local conky_widget_fonts_dir="$conky_widget_dir/fonts"
 
-               CR
-               select_available_filename "$path_conky" "-conky.7z"
-               if [ ! -z "$var_selected_filename" ]; then
+            mkdir -p "$conky_dir"
+            7z x "$var_selected_filename" -y "-o$conky_dir" | sed 's/^/    /'
+            CR
 
-                  # Uncompress the widget.
-                  print_info "Uncompressing archive..."
-                  local conky_dir="$HOME/.config/conky"
-                  local conky_widget_dir="$conky_dir/${THEME_PREFIXES[$theme_index_current]}"
-                  local conky_widget_fonts_dir="$conky_widget_dir/fonts"
+            # Check if the widget has fonts to install.
+            if [ -d "$conky_widget_fonts_dir" ]; then
+               print_info "Installing fonts..."
+               local local_fonts_dir="$HOME/.local/share/fonts"
+               mkdir -p "$local_fonts_dir"
+               cp "$conky_widget_fonts_dir"/* "$local_fonts_dir"
+            fi
 
-                  mkdir -p "$conky_dir"
-                  7z x "$var_selected_filename" -y "-o$conky_dir" | sed 's/^/    /'
-                  CR
-
-                  # Check if the widget has fonts to install.
-                  if [ -d "$conky_widget_fonts_dir" ]; then
-                     print_info "Installing fonts..."
-                     local local_fonts_dir="$HOME/.local/share/fonts"
-                     mkdir -p "$local_fonts_dir"
-                     cp "$conky_widget_fonts_dir"/* "$local_fonts_dir"
-                  fi
-
-                  # Check if Conky itself is installed.
-                  local package="conky-all"
-                  local installed=$(_is_package_installed $package)
-                  if [ $installed = 0 ]; then
-                     print_warning "<b>Conky</b> is not installed."
-                     confirm 1 "Install <b>Conky</b> package"
-                     if [ $var_confirmed -gt 0 ]; then
-                        print_info "Installing <b>Conky</b>..."
-                        sudo apt install -y $package | sed 's/^/    /'
-                        installed=1
-                     fi
-                  else
-                     print_info "Package <b>$package</b> already installed."
-                  fi
-
-                  # If Conky was or has been installed ask for creating an autostart entry.
-                  if [ ! $installed = 0 ]; then
-                     local conky_script="$conky_dir/${THEME_PREFIXES[$theme_index_current]}/start-diskio.sh"
-                     confirm 1 "<b>Autostart</b> Conky on login"
-                     if [ $var_confirmed -gt 0 ]; then
-                        print_info "Configuring <b>autostart</b>..."
-                        local path="$HOME/.config/autostart/"
-                        mkdir -p $path
-                        path=$(realpath $path)
-                        local filename1="$path_conky/wowssses-conky.desktop"
-                        local filename2="$path/wowssses-conky.desktop"
-                        local conky_script2=${conky_script//\//\\\/}
-                        cp "$filename1" "$filename2"
-                        sed -i 's/Exec\s\{0,\}=.*/Exec=\/usr\/bin\/bash '"$conky_script2"/ $filename2
-                     fi
-                     confirm 1 "Launch the <b>Conky widget</b> now"
-                     if [ $var_confirmed -gt 0 ]; then
-                        print_info "Launching the <b>Conky widget</b>..."
-                        bash "$conky_script"
-                     fi
-                  fi
+            # Check if Conky itself is installed.
+            local package="conky-all"
+            local installed=$(_is_package_installed $package)
+            if [ $installed = 0 ]; then
+               print_warning "<b>Conky</b> is not installed."
+               confirm 1 "Install <b>Conky</b> package"
+               if [ $var_confirmed -gt 0 ]; then
+                  print_info "Installing <b>Conky</b>..."
+                  sudo apt install -y $package | sed 's/^/    /'
+                  installed=1
                fi
+            else
+               print_info "Package <b>$package</b> already installed."
+            fi
+
+            # If Conky was or has been installed ask for creating an autostart entry.
+            if [ ! $installed = 0 ]; then
+               local conky_script="$conky_dir/${THEME_PREFIXES[$theme_index_current]}/start-diskio.sh"
+               confirm 1 "<b>Autostart</b> Conky on login"
+               if [ $var_confirmed -gt 0 ]; then
+                  print_info "Configuring <b>autostart</b>..."
+                  local path="$HOME/.config/autostart/"
+                  mkdir -p $path
+                  path=$(realpath $path)
+                  local filename1="$path_conky/wowssses-conky.desktop"
+                  local filename2="$path/wowssses-conky.desktop"
+                  local conky_script2=${conky_script//\//\\\/}
+                  cp "$filename1" "$filename2"
+                  sed -i 's/Exec\s\{0,\}=.*/Exec=\/usr\/bin\/bash '"$conky_script2"/ $filename2
+               fi
+               confirm 1 "Launch the <b>Conky widget</b> now"
+               if [ $var_confirmed -gt 0 ]; then
+                  print_info "Launching the <b>Conky widget</b>..."
+                  bash "$conky_script"
+               fi
+            fi
+         fi
 
       else
          print_info $skipping_
@@ -1077,7 +1072,7 @@ function setup_eza ()
       fi
 
       if [ $var_confirmed -gt 0 ]; then
-         local path="~/.config/eza"
+         local path="$HOME/.config/eza"
          print_info "Copying <b>$package theme</b>..."
          mkdir -p $path
          cp $path_data/theme.yml $path
@@ -1119,7 +1114,7 @@ function setup_geany ()
       fi
 
       if [ $var_confirmed -gt 0 ]; then
-         local path="~/.config/geany"
+         local path="$HOME/.config/geany"
          print_info "Installing <b>geany</b> settings..."
          mkdir -p $path
          7z x $path_data/geany-config.7z -y "-o$path" | sed 's/^/    /'
