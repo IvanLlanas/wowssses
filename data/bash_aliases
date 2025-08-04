@@ -237,19 +237,27 @@ function _go_dir ()
    local s=
    local id=
    local dir=
-   shopt -s extglob
+   local c1="\e[1m"
+   local c2="\e[0m"
+
    if [ $# -lt 1 ]; then
       echo "go - $go_description"
       echo "Usage: go dir-id"
       for (( i=0 ; i<$n ; i++ ));
       do
+         
          s=${_go_dirs[$i]}
          IFS=":"
             set $s
             id=$(_trim $1)
             dir=$2
 
-            printf "       go %-10s= cd %s\n" $id $dir
+            printf "       go "
+            echo -e -n $c1
+            printf %-10s $id
+            echo -e -n $c2
+            printf "= cd %s\n" $dir
+#           printf "       go %-10s= cd %s\n" $id $dir
       done
    else
       for (( i=0 ; i<$n ; i++ ));
