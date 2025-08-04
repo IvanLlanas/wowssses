@@ -1,78 +1,167 @@
 #export LC_ALL="C" # Breaks unicode characters!
 export LS_COLORS=""
 
-alias fr=fr-normal
-
 # Common aliases
 alias ..="cd .."
+   ___description="Move to parent directory."
 alias ...="cd ../.."
+   ____description="Move two directories above."
 alias ....="cd ../../.."
+   _____description="Move three directories above."
+alias .....="cd ../../../.."
+   ______description="Move four directories above."
+alias ......="cd ../../../../.."
+   _______description="Move five directories above."
 alias x="exit"
+   x_description="Exit shell."
 alias c="clear"
-#alias ls0="ls --group-directories-first"
-# --no-user --no-permissions
-alias ls0="eza --group-directories-first --header --time-style=\"+%Y.%m.%d %H:%M\""
-# more information
-alias d="ls0 -l"
-# more information and all files
-alias da="ls0 -la"
-# more information and git status
+   c_description="Clear console."
+alias d="eza --group-directories-first --header --time-style=\"+%Y.%m.%d %H:%M\" -l"
+   d_description="Directory listing, full information."
+alias da="d -a"
+   da_description="Directory listing, full information, all files."
 alias dg="d --git"
+   dg_description="Directory listing, full information, git status."
 alias l="less"
+   l_description="Less."
 alias q=geany
+   q_description="Preferred text editor (geany)."
 alias sq="sudo nano"
+   sq_description="sudo nano."
 alias ea="q ~/.bash_aliases"
-alias ra="source ~/.bash_aliases"
+   ea_description="Edit aliases."
+alias ra="unalias -a && source ~/.bash_aliases"
+   ra_description="Re-read aliases."
+alias hg="history|grep"
+   hg_description="Find in history."
+alias grep="grep --color=auto"
+   grep_description="grep using colors."
+alias egrep="egrep --color=auto"
+   egrep_description="egrep using colors."
+alias fgrep="fgrep --color=auto"
+   fgrep_description="fgrep using colors."
 
 alias start="xdg-open"
+   start_description="Launch file with the default application."
 alias fm="start ."
+   fm_description="Start a file manager in the current directory."
 alias bk="rm *.bak"
+   bk_description="Delete bak files."
 alias 7za="7z a -t7z -mx=9"
+   _7za_description="Compress using 7z with maximum compression settings."
 alias sysupdate="sudo apt update && sudo apt upgrade -y"
+   sysupdate_description="Update everything. No questions."
 alias clearhistory="cat /dev/null > ~/.bash_history && history -c"
+   clearhistory_description="Delete the shell history from memory and disk."
 alias bat="upower -i /org/freedesktop/UPower/devices/battery_BAT0"
-alias fr-normal="echo && free -h && echo &&  df / -h && echo"
-alias linkto='function _linktof_(){ ln -s "$(realpath $1)" "$HOME/Desktop/$2"; }; _linktof_'
+   bat_description="Show battery status."
 alias fstab="sudo nano /etc/fstab"
-alias mnt="sudo mount -a"
+   fstab_description="Edit /etc/fstab using nano."
+alias mnt="mount | awk -F' ' '{ printf \"%s\t%s\n\",\$1,\$3; }' | column -t | egrep ^/dev/ | sort"
+   mnt_description="Show device mounts."
+alias mnts="mount | awk -F' ' '{ printf \"%s\t%s\n\",\$1,\$3; }' | column -t | egrep ^/var/ | sort"
+   mnts_description="Show snap mounts."
 
-#alias kk="conky -c /home/ivan/.config/conky/inas/inas-diskio.conf"
 alias logout=gnome-session-quit
-
-# Mistakes ------------------------------------------------------
-alias car=cat
-alias cay=cat
-
-# INAS ----------------------------------------------------------
-alias fr-inas="echo && free -h && echo &&  df -h / /shared/videoteca /shared/filter && echo"
-alias smbed="sudo nano /etc/samba/smb.conf"
-alias smbcheck="sudo systemctl status smbd"
-alias smbrestart="sudo service smbd restart"
-
-# Debian --------------------------------------------------------
-# alias poweroff="sudo systemctl poweroff"
-# alias reboot="sudo systemctl reboot"
-
-# WoW servers ---------------------------------------------------
-alias wow="~/wowsss/scripts/wowsss/wowsss.sh"
-alias wowe="~/wowssses/scripts/wowssses/wowssses.sh"
-
-# Apps ----------------------------------------------------------
-alias matrix="gnome-terminal --window-with-profile=Matrix --full-screen -- cmatrix -b"
-# kmatrix - Mind the single quote!
-alias kmatrix='kill $(pidof cmatrix)'
+   logout_description="Logout desktop session."
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 # and in 10sec an alert will popup into Gnome alerts (calendar button).
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+   alert_description="Add an alert to Gnome alerts (calendar button)."
+
+# Debian --------------------------------------------------------
+function DebianAliases ()
+{
+   local os_is_ubuntu=0
+   local os_is_debian=0
+   local osname;
+
+   # Let's check which distro is in use.
+   if type lsb_release >/dev/null 2>&1; then
+      local osname=$(lsb_release -si)
+      case $osname in
+        *"Ubuntu"*) os_is_ubuntu=1;;
+        *"Debian"*) os_is_debian=1;;
+        *"mint"*)   os_is_ubuntu=1;;
+        *) echo "Unknow linux version";;
+      esac
+   fi
+   if [ $os_is_debian -gt 1 ]; then
+      alias poweroff="sudo systemctl poweroff"
+         poweroff_description="Poweroff system (like Ubuntu)."
+      alias reboot="sudo systemctl reboot"
+         reboot_description="Reboot system (like Ubuntu)."
+   fi
+}
+DebianAliases
+
+# Mistakes ------------------------------------------------------
+alias car=cat
+   car_description="cat correction."
+alias cay=cat
+   cay_description=$car_description
+
+
+# INAS ----------------------------------------------------------
+alias smbed="sudo nano /etc/samba/smb.conf"
+   smbed_description="Edit samba configuration file."
+alias smbcheck="sudo systemctl status smbd"
+   smbcheck_description="Show samba service status."
+alias smbrestart="sudo service smbd restart"
+   smbrestart_description="Restart samba service."
+
+# Apps ----------------------------------------------------------
+alias matrix="gnome-terminal --window-with-profile=Matrix --full-screen -- cmatrix -b"
+   matrix_description="Start full Matrix screensaver."
+# kmatrix - Mind the single quote!
+alias kmatrix='kill $(pidof cmatrix)'
+   kmatrix_description="Kill Matrix screensaver (if Q does not quit)."
+
+alias xc=xclip-copyfile
+   xc_description="Copy file(s) to the clipboard (only to console!)."
+alias xx=xclip-cutfile
+   xx_description="Cut file(s) to the clipboard (only to console!)."
+alias xv=xclip-pastefile
+   xv_description="Paste file(s) from the clipboard (only from console!)."
+
+# GZDoom --------------------------------------------------------
+if test -f "$HOME/doom/ports/gzdoom/current/gzdoom"; then
+   GZDOOMDIR="$HOME/doom/ports/gzdoom/current"
+   alias gz="$GZDOOMDIR/gzdoom -config $GZDOOMDIR/gzdoom.ini -file"
+      gz_description="Launch GZDoom with \"portable\" settings file."
+   alias gzx="gz xs.pk3 bfriend1.pk3 levelinfo.pk3"
+      gzx_description="Launch GZDoom with \"portable\" settings file and XS wad(s)."
+fi
+
+# WoW servers ---------------------------------------------------
+if test -f "$HOME/wowsss/wowsss/wowsss.sh"; then
+   alias wow="$HOME/wowsss/start.sh"
+      wow_description="Launch WoWSSS."
+fi
+
+# ---------------------------------------------------------------
+fr_description="Show memory and disk usage."
+if test -d "/shared/videoteca"; then
+      alias fr="echo && free -h && echo &&  df -h / /shared/videoteca /shared/filter && echo"
+else
+   if test -d "$HOME/Dropbox"; then
+      alias fr="echo && free -h && echo &&  df -h / $HOME/Dropbox $HOME/VM && echo"
+   else
+      alias fr="echo && free -h && echo &&  df -h / && echo"
+   fi      
+fi
 
 # Big aliases ---------------------------------------------------
-function ft ()
+# ---------------------------------------------------------------
+alias ft=_ft
+   ft_description="Find text inside files (ignore case, recursive and line numbers)."
+function _ft ()
 {
    if [ $# -lt 1 ]; then
-      echo "ft - Finds text inside files (ignore case, recursive and line numbers)."
-      echo "Usage: ft text [path]"
+      echo "ft - $ft_description"
+      echo "Usage: ft text [path=.]"
    else
       local text=$1
       local path=$2
@@ -83,3 +172,198 @@ function ft ()
    fi
 }
 
+# ---------------------------------------------------------------
+alias count=_count_files
+   count_description="Count the amount of files and directories recursively in a given path."
+function _count_files ()
+{
+   if [ $# -lt 1 ]; then
+      echo "count - $count_description"
+      echo "Usage: count [path=.]"
+   else
+      local path=$1
+      local d=
+      local f=
+      if [ $# -lt 2 ]; then
+         path="."
+      fi
+      d=$(find $path -type d 2>/dev/null | wc -l)
+      f=$(find $path -type f 2>/dev/null | wc -l)
+      # numfmt --grouping $n
+      printf " %'.3d files and %'.3d directories in \"%s\".\n" $f $d $(realpath $path)
+   fi
+}
+
+# ---------------------------------------------------------------
+alias chm=_chm
+   chm_description="Change file permissions recursively."
+alias chmn="chm 644"
+   chmn_description="Change file permissions to 664 recursively."
+function _chm ()
+{
+   if [ $# -lt 1 ]; then
+      echo "chm - $chm_description"
+      echo "Usage: chm value [path=.]"
+   else
+      local value=$1
+      local path=$2
+      if [ $# -lt 2 ]; then
+         path="."
+      fi
+      find "$path" -type f -exec chmod $value -- {} +
+   fi
+}
+
+# ---------------------------------------------------------------
+# cd shortcuts
+alias go=_go_dir
+   go_description="cd shortcuts by ID."
+_go_dirs=("gz    :~/doom/ports/gzdoom/current" \
+          "wad   :~/doom/wads" \
+          "vm    :~/VM" \
+          "dw    :~/Downloads" \
+          "wow   :~/Scripts/wowssses" \
+          "eza   :~/.config/eza" \
+          "geany :~/.config/geany" \
+          "xnview:~/.config/xnviewmp" \
+          "conky :~/.config/conky" \
+          "vlc   :~/.config/vlc" \
+         )
+function _go_dir ()
+{
+   local id0=$1
+   local n=${#_go_dirs[@]}
+   local i=
+   local s=
+   local id=
+   local dir=
+   shopt -s extglob
+   if [ $# -lt 1 ]; then
+      echo "go - $go_description"
+      echo "Usage: go dir-id"
+      for (( i=0 ; i<$n ; i++ ));
+      do
+         s=${_go_dirs[$i]}
+         IFS=":"
+            set $s
+            id=$(_trim $1)
+            dir=$2
+
+            printf "       go %-10s= cd %s\n" $id $dir
+      done
+   else
+      for (( i=0 ; i<$n ; i++ ));
+      do
+         s=${_go_dirs[$i]}
+         IFS=":"
+            set $s
+            id=$(_trim $1)
+            dir=$2
+         if [ "$id" = "$id0" ]; then
+            cd "${dir/\~/$HOME}"
+            return
+         fi
+      done
+      echo Dir-id \<$id0\> not found.
+   fi
+}
+
+function _trim ()
+{
+   local s=$1
+
+   # Turn on the extglob shell option
+   shopt -s extglob
+   ## Trim leading whitespaces
+   s="${s##*( )}"
+   ## Trim trailing whitespaces
+   s="${s%%*( )}"
+   # 5. Print final result
+   echo $s
+   # Turn off the extglob shell option
+   shopt -u extglob
+}
+
+# ---------------------------------------------------------------
+alias desktop_link=_desktop_link
+   desktop_link_description="Create an absolute symbolic link in the desktop to the specified file."
+function _desktop_link ()
+{
+   if [ $# -lt 2 ]; then
+      echo "?? - $_description"
+      echo "Usage: ?? source-file destination-link"
+   else
+      local source=$1
+      local dest=$2
+      ln -s "$(realpath "$source")" "$HOME/Desktop/$dest"
+   fi
+}
+
+# ---------------------------------------------------------------
+alias all=_list_aliases
+   all_description="Show a list of aliases".
+function _list_aliases ()
+{
+   local aliases=$(compgen -a)
+   local desc=0
+   local width2=
+   local count=
+   local i=1
+   local value=
+   local varname=
+   local c1=
+   local c2=
+
+   let width2=$COLUMNS-3
+   let n=width2/16
+
+   if [[ $1 != "" ]]; then
+      desc=1
+   fi
+
+   printf "   "
+   while IFS= read -r line ; do
+      value=${BASH_ALIASES[$line]}
+      if [[ $value == *"sudo "* ]]; then
+         suf="*"
+         c1="\e[93m"
+         c2="\e[0m"
+      else
+         suf=""
+         c1=
+         c2=
+      fi
+
+      echo -e -n $c1
+      printf %-16s $line$suf
+      echo -e -n $c2
+
+      if [ $desc -gt 0 ]; then
+         varname=${line//\./_}"_description"
+         if [[ -v $varname ]]; then
+            description=${!varname}
+         else
+            varname="_"$line"_description"
+            if [[ -v $varname ]]; then
+               description=${!varname}
+            else
+               description="?"
+            fi
+         fi
+         echo " - $description"
+         printf "   "
+      else
+
+         let i=i+1
+         if [ $i -gt $n ]; then
+            printf "\n   "
+            i=1
+         fi
+
+      fi
+   done <<< "$aliases"
+   if [ $desc -eq 0 ]; then
+      echo
+   fi
+   echo
+}
