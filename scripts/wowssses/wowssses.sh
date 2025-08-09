@@ -761,6 +761,16 @@ function setup_desktop_appearance ()
       gsettings set org.gnome.shell.extensions.dash-to-dock dock-position LEFT
       gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false
       gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 48
+
+      print_info "Setting up dialogs..."
+      gsettings set org.gnome.shell.overrides attach-modal-dialogs false
+
+      print_info "Setting up calendar..."
+      gsettings set org.gnome.desktop.interface clock-show-weekday true
+
+      print_info "Setting up brightness..."
+      gsettings set org.gnome.settings-daemon.plugins.power idle-brightness 100
+
       # gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode FIXED
       # gsettings set org.gnome.shell.extensions.dash-to-dock background-opacity 0.0
       # gsettings set org.gnome.shell.extensions.dash-to-dock unity-backlit-items true
@@ -825,6 +835,69 @@ function setup_desktop_wallpaper ()
       gsettings set org.gnome.desktop.background picture-uri-dark "file:///$var_selected_filename"
    fi
    CR
+}
+
+# ------------------------------------------------------------------------------
+# function setup_desktop_icons ()
+# Installs some nice icons.
+# ------------------------------------------------------------------------------
+function setup_desktop_icons ()
+{
+   print_title "Setup desktop <b>icons</b>"
+   confirm 0 "Install some nice icons (Yaru and .config/ivan)"
+   if [ $var_confirmed -gt 0 ]; then
+      print_info "Unpacking <b>.config/ivan</b> icons..."
+      local path="$HOME/.config/ivan"
+      mkdir -p $path
+      7z x $path_data/ivan-icons.7z -y "-o$path" | sed 's/^/    /'
+
+      print_info "Installing <b>trash</b> icons..."
+      _copy_trash_dual_icon 16  32
+      _copy_trash_dual_icon 24  48
+      _copy_trash_dual_icon 32  64
+      _copy_trash_dual_icon 48  96
+      _copy_trash_dual_icon 256 256
+   else
+      print_info $skipping_
+   fi
+   CR
+}
+
+function _copy_trash_dual_icon ()
+{
+   _copy_trash_icon $1 $1 ""
+   _copy_trash_icon $1 $2 "@2x"
+}
+
+function _copy_trash_icon ()
+{
+   local yaru="/usr/share/icons/Yaru"
+   local dir1="places"
+   local dir2="status"
+   local file1="user-trash.png"
+   local file2="user-trash-full.png"
+
+   local dirsz=$1
+   local filesz=$2
+   local sufix=$3
+
+   local path=
+   local dst=
+   local src=
+
+   szdir="$dirsz"x"$dirsz"$sufix
+   print_info " /$szdir/ "
+   path="$yaru/$szdir"
+
+   dst=$path/$dir1/$file1
+   src=$path_icons/trash/$filesz-$file1
+   backup_file "$dst"
+   sudo cp $src $dst
+
+   dst=$path/$dir2/$file2
+   src=$path_icons/trash/$filesz-$file2
+   backup_file "$dst"
+   sudo cp $src $dst
 }
 
 # ------------------------------------------------------------------------------
@@ -1181,20 +1254,21 @@ function main ()
 
    show_warning_message
    choose_theme
-   setup_grub_menu
-   setup_boot_logos
-   setup_login_screen_wallpaper
-   setup_keyboard_options
-   setup_startup_configuration_files
-   setup_terminal_profiles
-   setup_desktop_appearance
-   setup_desktop_wallpaper
-   setup_user_icon
-   setup_wowsss
-   setup_ss
-   setup_eza
-   setup_geany
-   setup_conky
+#   setup_grub_menu
+#   setup_boot_logos
+#   setup_login_screen_wallpaper
+#   setup_keyboard_options
+#   setup_startup_configuration_files
+#   setup_terminal_profiles
+#   setup_desktop_appearance
+#   setup_desktop_wallpaper
+   setup_desktop_icons
+#   setup_user_icon
+#   setup_wowsss
+#   setup_ss
+#   setup_eza
+#   setup_geany
+#   setup_conky
 
    print_info "<b>$cons_lit_product_name_short</b> finished."
    CR

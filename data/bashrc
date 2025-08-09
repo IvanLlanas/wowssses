@@ -35,17 +35,15 @@ if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
-color_prompt=yes
 # The output of ps1 should not be counted towards the length of your prompt, so it must be wrapped in \[...\] as well.
 # https://stackoverflow.com/questions/42121662/why-do-my-bash-prompt-colors-make-cursor-appear-in-wrong-spot
 # That did it. The reason, it turns out, is that bash needs to be told "the following characters are non-printable" so it doesn't become confused over the length of the prompt. This is done by enclosing non-printable characters in \[ and \]. See tldp.org/HOWTO/Bash-Prompt-HOWTO/nonprintingchars.html
-if [ "$color_prompt" = yes ]; then
-#    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;36m\]\u\[\033[1;37m\]@\[\033[1;32m\]\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;36m\]\u\[\033[1;37m\]@\[\033[1;32m\]\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]> '
+if [ "$SSH_TTY" = "" ]; then
+   PS1='${debian_chroot:+($debian_chroot)}\[\033[1;36m\]\u\[\033[0m\]@\[\033[1;32m\]\h\[\033[0m\]:\[\033[1;34m\]\w\[\033[0m\]> '
 else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+   PS1='${debian_chroot:+($debian_chroot)}\[\033[38;2;0;0;0m\]\[\033[48;2;0;255;255m\] \u\[\033[48;2;192;192;192m\]@\[\033[48;2;64;212;64m\]\h\[\033[48;2;192;192;192m\]:\[\033[48;2;0;128;255m\]\w \[\033[0m\]> '
 fi
-unset color_prompt force_color_prompt
+# Monocrhome: PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
