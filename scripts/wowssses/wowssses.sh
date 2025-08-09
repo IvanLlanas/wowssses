@@ -1254,21 +1254,21 @@ function main ()
 
    show_warning_message
    choose_theme
-#   setup_grub_menu
-#   setup_boot_logos
-#   setup_login_screen_wallpaper
-#   setup_keyboard_options
-#   setup_startup_configuration_files
-#   setup_terminal_profiles
-#   setup_desktop_appearance
-#   setup_desktop_wallpaper
+   setup_grub_menu
+   setup_boot_logos
+   setup_login_screen_wallpaper
+   setup_keyboard_options
+   setup_startup_configuration_files
+   setup_terminal_profiles
+   setup_desktop_appearance
+   setup_desktop_wallpaper
    setup_desktop_icons
-#   setup_user_icon
-#   setup_wowsss
-#   setup_ss
-#   setup_eza
-#   setup_geany
-#   setup_conky
+   setup_user_icon
+   setup_wowsss
+   setup_ss
+   setup_eza
+   setup_geany
+   setup_conky
 
    print_info "<b>$cons_lit_product_name_short</b> finished."
    CR
