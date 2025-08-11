@@ -306,6 +306,7 @@ _go_dirs=("gz    :~/doom/ports/gzdoom/current" \
           "wad   :~/doom/wads" \
           "docs  :~/Dropbox/Documents" \
           "save  :~/Dropbox/Apps/Games/_savegames/Active" \
+          "saves :~/Dropbox/Apps/Games/_savegames/Active" \
           "web   :~/Dropbox/Web" \
           "vm    :~/VM" \
           "dw    :~/Downloads" \
