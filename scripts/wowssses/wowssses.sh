@@ -849,7 +849,7 @@ function setup_desktop_icons ()
       print_info "Unpacking <b>.config/ivan</b> icons..."
       local path="$HOME/.config/ivan"
       mkdir -p $path
-      7z x $path_data/ivan-icons.7z -y "-o$path" | sed 's/^/    /'
+      7z x $path_data/ivan-config.7z -y "-o$path" | sed 's/^/    /'
 
       print_info "Installing <b>trash</b> icons..."
       _copy_trash_dual_icon 16  32
