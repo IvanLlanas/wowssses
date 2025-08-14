@@ -61,6 +61,13 @@ alias .....="cd ../../../.."
    ______description="Move four directories above."
 alias ......="cd ../../../../.."
    _______description="Move five directories above."
+alias mk="_mk"
+   mk_description="Create a directory an enter."
+function _mk ()
+{
+   mkdir "$1"
+   cd "$1"
+}
 alias x="exit"
    x_description="Exit shell."
 alias c="clear"
@@ -188,6 +195,10 @@ alias car=cat
 alias cay=cat
    cay_description=$car_description
 
+# CC ------------------------------------------------------------
+alias saveall="$HOME/Scripts/sh/save_all.sh"
+   saveall_description="Make a backup of all meaningful configurations."
+
 # INAS ----------------------------------------------------------
 alias smbed="sudo nano /etc/samba/smb.conf"
    smbed_description="Edit samba configuration file."
@@ -257,6 +268,46 @@ function _ft ()
 }
 
 # ---------------------------------------------------------------
+alias pdu=_pdu
+   pdu_description="Progressive disk usage."
+function _pdu ()
+{
+   local size0=
+   local size1=
+   local size=
+   local update=$3
+   if [ "$update" == "" ]; then
+      update=2
+   fi
+
+   local path=$1
+   if [ "$path" == "" ]; then
+      ___cmd_descr "pdu" "$pdu_description"
+      ___cmd_usage "pdu path [-m/-b] [seconds update]"
+      return
+   fi
+   path=$(realpath "$path")
+
+   local mode=$2
+   if [ "$mode" == "" ]; then
+      mode="-m"
+   fi
+
+   echo Progressive disk usage in \"$path\" "($update seconds update)":
+
+   local cmd="du $path -s $mode"
+   read size0 _ < <($cmd 2> /dev/null)
+   echo
+
+   while true ; do
+      read size1 _ < <($cmd 2> /dev/null)
+      let size=size1-size0
+      printf "\r   %'.3d / %'.3d " $size $size0
+      sleep $update
+   done
+}
+
+# ---------------------------------------------------------------
 alias count=_count_files
    count_description="Count the amount of files and directories recursively in a given path."
 function _count_files ()
@@ -311,6 +362,7 @@ _go_dirs=("gz    :~/doom/ports/gzdoom/current" \
           "vm    :~/VM" \
           "dw    :~/Downloads" \
           "wow   :~/Scripts/wowssses" \
+          "sh    :~/Scripts/sh" \
           "ivan  :~/.config/ivan" \
           "eza   :~/.config/eza" \
           "geany :~/.config/geany" \
@@ -397,12 +449,14 @@ function _list_aliases ()
 
    if [[ $1 != "" ]]; then
       cmd=$1
-      local cmdv=${BASH_ALIASES[$cmd]}
-      if [ "$cmdv" = "" ]; then
-         ___cmd_error "all" "Unknown alias <$cmd>."
-      else
-         ___print_alias 1 0 $cmd
-         return
+      if [ "$cmd" != "?" ]; then
+         local cmdv=${BASH_ALIASES[$cmd]}
+         if [ "$cmdv" = "" ]; then
+            ___cmd_error "all" "Unknown alias <$cmd>."
+         else
+            ___print_alias 1 0 $cmd
+            return
+         fi
       fi
       desc=1
    fi
@@ -426,7 +480,7 @@ function _list_aliases ()
        fi
 
    done <<< "$aliases"
-   
+
    if [ $desc -eq 0 ] && [ $cr -eq 0 ]; then
       echo
    fi
@@ -454,7 +508,7 @@ function ___print_alias ()
       c1=
       c2=
    fi
-   
+
    if [ $desc -gt 0 ]; then
       printf "   "
       echo -e -n $c1

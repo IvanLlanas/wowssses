@@ -852,52 +852,91 @@ function setup_desktop_icons ()
       7z x $path_data/ivan-config.7z -y "-o$path" | sed 's/^/    /'
 
       print_info "Installing <b>trash</b> icons..."
-      _copy_trash_dual_icon 16  32
-      _copy_trash_dual_icon 24  48
-      _copy_trash_dual_icon 32  64
-      _copy_trash_dual_icon 48  96
-      _copy_trash_dual_icon 256 256
+      _replace_yaru_icon "places/user-trash.png"       "trash/user-trash-"
+      _replace_yaru_icon "status/user-trash-full.png"  "trash/user-trash-full-"
+
+      print_info "Installing <b>floppy-disk</b> icons..."
+      _replace_yaru_icon "devices/media-floppy.png"    "floppy-disk/floppy-disk-1-"
+
+      print_info "Installing <b>optical-disk</b> icons..."
+      _replace_yaru_icon "devices/media-optical.png"   "optical-disk/optical-disk-"
+
+      print_info "Installing <b>harddisk</b> icons..."
+      _replace_yaru_icon "devices/drive-harddisk.png"  "harddisk/harddisk-1-"
+
+      print_info "Installing <b>ssd</b> icons..."
+      _replace_yaru_icon "devices/drive-harddisk-solidstate.png" "drive-ssd/ssd-1-"
+
+      print_info "Installing <b>usb-drive</b> icons..."
+      _replace_yaru_icon "devices/drive-harddisk-usb.png" "drive-usb/drive-usb-1-"
+
+      print_info "Installing <b>pendrive</b> icons..."
+      _replace_yaru_icon "devices/drive-removable-media-usb.png" "removable-usb/pendrive-1-"
+
+      print_info "Installing <b>system-settings</b> icons..."
+      _replace_yaru_icon "apps/preferences-system.png" "settings/settings-1-"
+
+      print_info "Installing <b>disks-app</b> icons..."
+      _replace_yaru_icon "apps/disk-utility-app.png"   "disk-utility-app/disk-utility-app-1-"
+
    else
       print_info $skipping_
    fi
    CR
 }
 
-function _copy_trash_dual_icon ()
-{
-   _copy_trash_icon $1 $1 ""
-   _copy_trash_icon $1 $2 "@2x"
-}
-
-function _copy_trash_icon ()
+_yaru_icon_sizes=(16 24 32 48 256)
+function _replace_yaru_icon ()
 {
    local yaru="/usr/share/icons/Yaru"
-   local dir1="places"
-   local dir2="status"
-   local file1="user-trash.png"
-   local file2="user-trash-full.png"
+   local dst_file=$1
+   local src_prefix=$2
+   local i
+   local i2
+   local src
+   local dst
 
-   local dirsz=$1
-   local filesz=$2
-   local sufix=$3
+   for i in "${_yaru_icon_sizes[@]}"
+   do
+      let i2=i*2
 
-   local path=
-   local dst=
-   local src=
+      dst=$yaru/$i\x$i/$dst_file
+      if [ -f "$dst" ]; then
+         src=$path_icons/desktop/$src_prefix$i.png
+         if [ -f "$src" ]; then
+            _backup_and_replace_file "$dst" "$src"
+         else
+            print_warning "Not found: $src"
+         fi
+      else
+         print_warning "Not found: $dst"
+      fi
 
-   szdir="$dirsz"x"$dirsz"$sufix
-   print_info " /$szdir/ "
-   path="$yaru/$szdir"
+      dst=$yaru/$i\x$i@2x/$dst_file
+      if [ -f "$dst" ]; then
+         src=$path_icons/desktop/$src_prefix$i2.png
+         if [ ! -f "$src" ]; then
+            src=$path_icons/desktop/$src_prefix$i.png
+         fi
+         if [ -f "$src" ]; then
+            _backup_and_replace_file "$dst" "$src"
+         else
+            print_warning "Not found: $src"
+         fi
+      else
+         print_warning "Not found: $dst"
+      fi
 
-   dst=$path/$dir1/$file1
-   src=$path_icons/trash/$filesz-$file1
+   done
+}
+
+function _backup_and_replace_file  ()
+{
+   local dst=$1
+   local src=$2
+
    backup_file "$dst"
-   sudo cp $src $dst
-
-   dst=$path/$dir2/$file2
-   src=$path_icons/trash/$filesz-$file2
-   backup_file "$dst"
-   sudo cp $src $dst
+   sudo cp "$src" "$dst"
 }
 
 # ------------------------------------------------------------------------------
@@ -1253,22 +1292,22 @@ function main ()
    shopt -s nocasematch
 
    show_warning_message
-   choose_theme
-   setup_grub_menu
-   setup_boot_logos
-   setup_login_screen_wallpaper
-   setup_keyboard_options
-   setup_startup_configuration_files
-   setup_terminal_profiles
-   setup_desktop_appearance
-   setup_desktop_wallpaper
+#   choose_theme
+#   setup_grub_menu
+#   setup_boot_logos
+#   setup_login_screen_wallpaper
+#   setup_keyboard_options
+#   setup_startup_configuration_files
+#   setup_terminal_profiles
+#   setup_desktop_appearance
+#   setup_desktop_wallpaper
    setup_desktop_icons
-   setup_user_icon
-   setup_wowsss
-   setup_ss
-   setup_eza
-   setup_geany
-   setup_conky
+#   setup_user_icon
+#   setup_wowsss
+#   setup_ss
+#   setup_eza
+#   setup_geany
+#   setup_conky
 
    print_info "<b>$cons_lit_product_name_short</b> finished."
    CR
