@@ -80,12 +80,14 @@ alias dg="d --git"
    dg_description="Directory listing, full information, git status."
 alias l="less"
    l_description="Less."
+alias q2=_q
+   q2_description="Preferred text editor (geany)."
 alias q=_q
-   q_description="Preferred text editor (geany)."
+   q_description="Preferred text editor (kate)."
 function _q()
 {
    # We don't want to see geany's console messages anytime...
-   geany "$@" > /dev/null &
+   kate "$@" > /dev/null &
 }
 alias sq="sudo nano"
    sq_description="sudo nano."
