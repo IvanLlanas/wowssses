@@ -1,4 +1,4 @@
-# My bask aliases - Ivan Llanas
+# My bash aliases - Ivan Llanas
 
 #export LC_ALL="C" # Breaks unicode characters!
 export LS_COLORS=""
@@ -51,6 +51,10 @@ function ___trim ()
 # ----------------------------------------------------------------------
 
 # Common aliases
+alias eal="q ~/.bash_aliases"
+   eal_description="Edit aliases."
+alias ral="unalias -a && source ~/.bash_aliases"
+   ral_description="Re-read aliases."
 alias ..="cd .."
    ___description="Move to parent directory."
 alias ...="cd ../.."
@@ -80,21 +84,20 @@ alias dg="d --git"
    dg_description="Directory listing, full information, git status."
 alias l="less"
    l_description="Less."
-alias q2=_q
-   q2_description="Preferred text editor (geany)."
 alias q=_q
    q_description="Preferred text editor (kate)."
 function _q()
 {
-   # We don't want to see geany's console messages anytime...
+   local pid=$(pidof kate)
+   if [ "$pid" == "" ]; then
+      kate
+      sleep 0.5
+   fi
+   # We don't want to see console messages anytime...
    kate "$@" > /dev/null &
 }
 alias sq="sudo nano"
    sq_description="sudo nano."
-alias ea="q ~/.bash_aliases"
-   ea_description="Edit aliases."
-alias ra="unalias -a && source ~/.bash_aliases"
-   ra_description="Re-read aliases."
 alias fh="__fh"
    fh_description="Find in history."
 function __fh ()
@@ -122,6 +125,10 @@ alias fm="start ."
    fm_description="Start a file manager in the current directory."
 alias bk="rm *.bak"
    bk_description="Delete bak files."
+alias ra="rar a -r -s -m5 -md1g"
+   ra_description="Compress using rar with maximum compression settings."
+alias rl="rar l"
+   rl_description="List rar archive contents."
 alias 7za="7z a -t7z -mx=9"
    _7za_description="Compress using 7z with maximum compression settings."
 alias sysupdate="sudo apt update && sudo apt upgrade -y"
@@ -241,12 +248,12 @@ fi
 # ---------------------------------------------------------------
 fr_description="Show memory and disk usage."
 if test -d "/shared/videoteca"; then
-      alias fr="echo && free -h && echo &&  df -h / /shared/videoteca /shared/filter && echo"
+      alias fr="echo && free -h && echo && df -h / /shared/videoteca /shared/filter && echo"
 else
    if [ $HOSTNAME = "cc" ]; then
-      alias fr="echo && free -h && echo &&  df -h / $HOME/Dropbox $HOME/VM $HOME/store && echo"
+      alias fr="echo && free -h && echo && df -h / $HOME/Dropbox $HOME/VM $HOME/store && echo"
    else
-      alias fr="echo && free -h && echo &&  df -h / && echo"
+      alias fr="echo && free -h && echo && df -h / && echo"
    fi
 fi
 
