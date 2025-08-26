@@ -1,5 +1,10 @@
 # My bash aliases - Ivan Llanas
 
+# Autocompletion in aliases!
+# Google: ubuntu add autocompletion in aliases
+# https://askubuntu.com/questions/652776/how-to-get-tab-to-work-with-arguments-of-aliases-to-autocomplete-as-can-be-don
+# https://unix.stackexchange.com/questions/4219/how-do-i-get-bash-completion-for-command-aliases
+
 #export LC_ALL="C" # Breaks unicode characters!
 export LS_COLORS=""
 
@@ -84,6 +89,10 @@ alias dg="d --git"
    dg_description="Directory listing, full information, git status."
 alias l="less"
    l_description="Less."
+alias q3=tilde
+   q3_description="Console text editor (tilde)."
+alias q2=geany
+   q2_description="Alternative text editor (geany)."
 alias q=_q
    q_description="Preferred text editor (kate)."
 function _q()
@@ -129,6 +138,8 @@ alias ra="rar a -r -s -m5 -md1g"
    ra_description="Compress using rar with maximum compression settings."
 alias rl="rar l"
    rl_description="List rar archive contents."
+alias rx="rar x"
+   rl_description="Extract archive contents."
 alias 7za="7z a -t7z -mx=9"
    _7za_description="Compress using 7z with maximum compression settings."
 alias sysupdate="sudo apt update && sudo apt upgrade -y"

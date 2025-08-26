@@ -4,7 +4,7 @@
 #    \   \/\/  /  _ \  \/\/   /____  \_____  \_____  \   ___/______  \
 #     \       (  (_) )       /        \       \       \       \       \
 #      \__/\  /\____/\__/\  /_______  /_____  /_____  /_____  /_____  /
-#           \/            \/        \/      \/      \/      \/      \/ 2.2
+#           \/            \/        \/      \/      \/      \/      \/ 2.3
 # ------------------------------------------------------------------------------
 # World of Warcraft Server Script System Environment Setup
 # (C) Copyright by Ivan Llanas, 2023-25
@@ -18,8 +18,8 @@
 
 cons_lit_product_name_short="WoWSSSES"
 cons_lit_product_name_long="World of Warcraft Server Script System Environment Setup"
-cons_lit_product_version="2.2"
-cons_lit_product_date="2025-08-02"
+cons_lit_product_version="2.3"
+cons_lit_product_date="2025-08-27"
 
 # Move to the script location.
 cd "$(dirname "$0")"
@@ -838,108 +838,6 @@ function setup_desktop_wallpaper ()
 }
 
 # ------------------------------------------------------------------------------
-# function setup_desktop_icons ()
-# Installs some nice icons.
-# ------------------------------------------------------------------------------
-function setup_desktop_icons ()
-{
-   print_title "Setup desktop <b>icons</b>"
-   confirm 0 "Install some nice icons (Yaru and .config/ivan)"
-   if [ $var_confirmed -gt 0 ]; then
-      print_info "Unpacking <b>.config/ivan</b> icons..."
-      local path="$HOME/.config/ivan"
-      mkdir -p $path
-      7z x $path_data/ivan-config.7z -y "-o$path" | sed 's/^/    /'
-
-      print_info "Installing <b>trash</b> icons..."
-      _replace_yaru_icon "places/user-trash.png"       "trash/user-trash-"
-      _replace_yaru_icon "status/user-trash-full.png"  "trash/user-trash-full-"
-
-      print_info "Installing <b>floppy-disk</b> icons..."
-      _replace_yaru_icon "devices/media-floppy.png"    "floppy-disk/floppy-disk-1-"
-
-      print_info "Installing <b>optical-disk</b> icons..."
-      _replace_yaru_icon "devices/media-optical.png"   "optical-disk/optical-disk-"
-
-      print_info "Installing <b>harddisk</b> icons..."
-      _replace_yaru_icon "devices/drive-harddisk.png"  "harddisk/harddisk-1-"
-
-      print_info "Installing <b>ssd</b> icons..."
-      _replace_yaru_icon "devices/drive-harddisk-solidstate.png" "drive-ssd/ssd-1-"
-
-      print_info "Installing <b>usb-drive</b> icons..."
-      _replace_yaru_icon "devices/drive-harddisk-usb.png" "drive-usb/drive-usb-1-"
-
-      print_info "Installing <b>pendrive</b> icons..."
-      _replace_yaru_icon "devices/drive-removable-media-usb.png" "removable-usb/pendrive-1-"
-
-      print_info "Installing <b>system-settings</b> icons..."
-      _replace_yaru_icon "apps/preferences-system.png" "settings/settings-1-"
-
-      print_info "Installing <b>disks-app</b> icons..."
-      _replace_yaru_icon "apps/disk-utility-app.png"   "disk-utility-app/disk-utility-app-1-"
-
-   else
-      print_info $skipping_
-   fi
-   CR
-}
-
-_yaru_icon_sizes=(16 24 32 48 256)
-function _replace_yaru_icon ()
-{
-   local yaru="/usr/share/icons/Yaru"
-   local dst_file=$1
-   local src_prefix=$2
-   local i
-   local i2
-   local src
-   local dst
-
-   for i in "${_yaru_icon_sizes[@]}"
-   do
-      let i2=i*2
-
-      dst=$yaru/$i\x$i/$dst_file
-      if [ -f "$dst" ]; then
-         src=$path_icons/desktop/$src_prefix$i.png
-         if [ -f "$src" ]; then
-            _backup_and_replace_file "$dst" "$src"
-         else
-            print_warning "Not found: $src"
-         fi
-      else
-         print_warning "Not found: $dst"
-      fi
-
-      dst=$yaru/$i\x$i@2x/$dst_file
-      if [ -f "$dst" ]; then
-         src=$path_icons/desktop/$src_prefix$i2.png
-         if [ ! -f "$src" ]; then
-            src=$path_icons/desktop/$src_prefix$i.png
-         fi
-         if [ -f "$src" ]; then
-            _backup_and_replace_file "$dst" "$src"
-         else
-            print_warning "Not found: $src"
-         fi
-      else
-         print_warning "Not found: $dst"
-      fi
-
-   done
-}
-
-function _backup_and_replace_file  ()
-{
-   local dst=$1
-   local src=$2
-
-   backup_file "$dst"
-   sudo cp "$src" "$dst"
-}
-
-# ------------------------------------------------------------------------------
 # function setup_user_icon ()
 # Sets the GUI user icon.
 # ------------------------------------------------------------------------------
@@ -1293,6 +1191,7 @@ function main ()
 
    show_warning_message
    choose_theme
+
    setup_grub_menu
    setup_boot_logos
    setup_login_screen_wallpaper
@@ -1301,7 +1200,6 @@ function main ()
    setup_terminal_profiles
    setup_desktop_appearance
    setup_desktop_wallpaper
-   setup_desktop_icons
    setup_user_icon
    setup_wowsss
    setup_ss
