@@ -1,12 +1,14 @@
-# My bash aliases - Ivan Llanas
+# Ivan Llanas Aliases System
 
-# Autocompletion in aliases!
-# Google: ubuntu add autocompletion in aliases
-# https://askubuntu.com/questions/652776/how-to-get-tab-to-work-with-arguments-of-aliases-to-autocomplete-as-can-be-don
-# https://unix.stackexchange.com/questions/4219/how-do-i-get-bash-completion-for-command-aliases
+_product_name="Ivan Llanas Aliases System"
+_product_version="2.0"
+
+echo [$_product_name $_product_version] loading...
 
 #export LC_ALL="C" # Breaks unicode characters!
 export LS_COLORS=""
+# Backup IFS to restore it whenever is changed.
+IFS0=$IFS
 
 # Aliases support functions --------------------------------------------
 function ___cmd_descr ()
@@ -100,7 +102,7 @@ function _q()
    local pid=$(pidof kate)
    if [ "$pid" == "" ]; then
       kate
-      sleep 0.5
+      sleep 0.8
    fi
    # We don't want to see console messages anytime...
    kate "$@" > /dev/null &
@@ -126,7 +128,6 @@ alias egrep="egrep --color=auto"
    egrep_description="egrep using colors."
 alias fgrep="fgrep --color=auto"
    fgrep_description="fgrep using colors."
-
 
 alias start="xdg-open"
    start_description="Launch file with the default application."
@@ -200,7 +201,7 @@ function DebianAliases ()
         *) echo "DebianAliases: Unknown linux version.";;
       esac
    fi
-   if [ $os_is_debian -gt 1 ]; then
+   if [ $os_is_debian -gt 0 ]; then
       alias poweroff="sudo systemctl poweroff"
          poweroff_description="Poweroff system (like Ubuntu)."
       alias reboot="sudo systemctl reboot"
@@ -211,7 +212,7 @@ DebianAliases
 
 # Mistakes ------------------------------------------------------
 alias car=cat
-   car_description="cat correction."
+   car_description="cat (correction)."
 alias cay=cat
    cay_description=$car_description
 
@@ -377,10 +378,10 @@ _go_dirs=("gz    :~/doom/ports/gzdoom/current" \
           "wad   :~/doom/wads" \
           "docs  :~/Dropbox/Documents" \
           "save  :~/Dropbox/Apps/Games/_savegames/Active" \
-          "saves :~/Dropbox/Apps/Games/_savegames/Active" \
           "web   :~/Dropbox/Web" \
           "vm    :~/VM" \
           "dw    :~/Downloads" \
+          "shared:~/VM/_shared" \
           "wow   :~/Scripts/wowssses" \
           "sh    :~/Scripts/sh" \
           "ivan  :~/.config/ivan" \
@@ -388,37 +389,34 @@ _go_dirs=("gz    :~/doom/ports/gzdoom/current" \
           "geany :~/.config/geany" \
           "xnview:~/.config/xnviewmp" \
           "conky :~/.config/conky" \
-          "vlc   :~/.config/vlc" \
          )
 function _go_dir ()
 {
-   local id0=$1
-   local n=${#_go_dirs[@]}
-   local i=
-   local s=
-   local id=
-   local dir=
-   local c1="\e[1m"
-   local c2="\e[0m"
+   local id0 n i s id dir c1 c2
+
+   id0=$1
+   n=${#_go_dirs[@]}
+   c1="\e[1m"
+   c2="\e[0m"
 
    if [ $# -lt 1 ]; then
       ___cmd_descr "go" "$go_description"
       ___cmd_usage "go dir-id"
       for (( i=0 ; i<$n ; i++ ));
       do
-
          s=${_go_dirs[$i]}
          IFS=":"
             set $s
             id=$(___trim $1)
             dir=$2
+         IFS=$IFS0
 
-            printf "       go "
-            echo -e -n $c1
-            printf %-10s $id
-            echo -e -n $c2
-            printf "= cd %s\n" $dir
-#           printf "       go %-10s= cd %s\n" $id $dir
+         printf "       go "
+         echo -e -n $c1
+         printf %-10s $id
+         echo -e -n $c2
+         printf "= cd %s\n" $dir
+#        printf "       go %-10s= cd %s\n" $id $dir
       done
    else
       for (( i=0 ; i<$n ; i++ ));
@@ -428,6 +426,7 @@ function _go_dir ()
             set $s
             id=$(___trim $1)
             dir=$2
+         IFS=$IFS0
          if [ "$id" = "$id0" ]; then
             cd "${dir/\~/$HOME}"
             return
@@ -437,14 +436,39 @@ function _go_dir ()
    fi
 }
 
+function __complete_go ()
+{
+   local i n opts cur opts
+
+   COMPREPLY=()
+   cur="${COMP_WORDS[COMP_CWORD]}"
+
+   opts=""
+
+  n=${#_go_dirs[@]}
+   for (( i=0 ; i<$n ; i++ ));
+   do
+      s=${_go_dirs[$i]}
+      IFS=":"
+         set $s
+         id=$(___trim $1)
+      IFS=$IFS0
+      opts="$opts $id"
+   done
+
+   COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+   return 0
+}
+complete -F __complete_go go
+
 # ---------------------------------------------------------------
 alias desktop_link=_desktop_link
    desktop_link_description="Create an absolute symbolic link in the desktop to the specified file."
 function _desktop_link ()
 {
    if [ $# -lt 2 ]; then
-      ___cmd_descr "??" "$??_description"
-      ___cmd_usage "?? source-file destination-link"
+      ___cmd_descr "desktop_link" "$desktop_link_description"
+      ___cmd_usage "desktop_link source-file destination-link"
    else
       local source=$1
       local dest=$2
@@ -457,12 +481,12 @@ alias all=_list_aliases
    all_description="Show a list of aliases".
 function _list_aliases ()
 {
-   local aliases=$(compgen -a)
-   local desc=0
-   local width2=
-   local i=1
-   local cmd=
-   local cr=0
+   local aliases desc width2 i cmd cr
+
+   aliases=$(compgen -a)
+   desc=0
+   i=1
+   cr=0
 
    let width2=$COLUMNS-3
    let n=width2/16
@@ -509,14 +533,11 @@ function _list_aliases ()
 
 function ___print_alias ()
 {
-   local desc=$1
-   local indent=$2
-   local cmd=$3
-   local value=
-   local suf=
-   local varname=
-   local c1=
-   local c2=
+   local desc indent cmd value suf varname c1 c2
+
+   desc=$1
+   indent=$2
+   cmd=$3
 
    value=${BASH_ALIASES[$cmd]}
    if [[ $value == *"sudo "* ]]; then
@@ -557,3 +578,31 @@ function ___print_alias ()
       echo -e -n $c2
    fi
 }
+
+function __complete_all ()
+{
+   local cur opts
+
+   # get all the aliases names
+   opts=$(compgen -a)
+   opts="? "${opts//$'\r'}
+
+   COMPREPLY=()
+   cur="${COMP_WORDS[COMP_CWORD]}"
+   #prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+   COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+   return 0
+}
+
+# Autocompletion in aliases!
+# Google: ubuntu add autocompletion in aliases
+# https://askubuntu.com/questions/652776/how-to-get-tab-to-work-with-arguments-of-aliases-to-autocomplete-as-can-be-don
+# https://unix.stackexchange.com/questions/4219/how-do-i-get-bash-completion-for-command-aliases
+
+# `all` <tab> <tab> would show autocomplete above wordlist
+complete -F __complete_all all
+# [Verificatio needed] If you want simplest wordlist, use below instead:
+#complete -W "help verbose version" all
+
+echo [$_product_name $_product_version] loaded.
