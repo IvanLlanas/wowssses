@@ -106,19 +106,25 @@ function ___editors_aliases ()
    n=${#editors_name[@]}
    q_index=1
 
+   echo -n "Q-Editors: "
    for (( i=0 ; i<$n ; i++ ));
    do
       if test -f "${editors_file[$i]}"; then
-         echo "Using ${editors_name[$i]}..."
-         if [ $q_index -eq 1 ]; then num=""
-         else                        num=$q_index
+         if [ $q_index -eq 1 ]; then
+            num=""
+         else
+            num=$q_index
+            echo -n ", "
          fi
+         echo -n ${editors_name[$i]}"($q_index)"
+
          alias "q$num"="${editors_alias[$i]}"
          variable=q$num"_description"
          eval ${variable}=${editors_pref[$i]}"\ text\ editor\ \("${editors_name[$i]}"\)."
          let q_index++
       fi
    done
+   echo "."
 }
 ___editors_aliases
 
