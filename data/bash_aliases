@@ -91,13 +91,38 @@ alias dg="d --git"
    dg_description="Directory listing, full information, git status."
 alias l="less"
    l_description="Less."
-alias q3=tilde
-   q3_description="Console text editor (tilde)."
-alias q2=geany
-   q2_description="Alternative text editor (geany)."
-alias q=_q
-   q_description="Preferred text editor (kate)."
-function _q()
+
+# Editors --------------------------------------------------------------
+function ___editors_aliases ()
+{
+   local editors_name=(  "kate"          "geany"          "tilde"          "nano"          )
+   local editors_file=(  "/usr/bin/kate" "/usr/bin/geany" "/usr/bin/tilde" "/usr/bin/nano" )
+   local editors_alias=( "___kate"       "geany"          "tilde"          "nano"          )
+   local editors_pref=(  "Preferred"     "Alternative"    "Console"        "console" )
+
+   local i n num q_index variable
+
+   i=0
+   n=${#editors_name[@]}
+   q_index=1
+
+   for (( i=0 ; i<$n ; i++ ));
+   do
+      if test -f "${editors_file[$i]}"; then
+         echo "Using ${editors_name[$i]}..."
+         if [ $q_index -eq 1 ]; then num=""
+         else                        num=$q_index
+         fi
+         alias "q$num"="${editors_alias[$i]}"
+         variable=q$num"_description"
+         eval ${variable}=${editors_pref[$i]}"\ text\ editor\ \("${editors_name[$i]}"\)."
+         let q_index++
+      fi
+   done
+}
+___editors_aliases
+
+function ___kate()
 {
    local pid=$(pidof kate)
    if [ "$pid" == "" ]; then
@@ -109,9 +134,12 @@ function _q()
 }
 alias sq="sudo nano"
    sq_description="sudo nano."
-alias fh="__fh"
+
+# ----------------------------------------------------------------------
+
+alias fh="___fh"
    fh_description="Find in history."
-function __fh ()
+function ___fh ()
 {
    if [ $# -lt 1 ]; then
       ___cmd_descr "fh" "$fh_description"
@@ -140,7 +168,7 @@ alias ra="rar a -r -s -m5 -md1g"
 alias rl="rar l"
    rl_description="List rar archive contents."
 alias rx="rar x"
-   rl_description="Extract archive contents."
+   rx_description="Extract archive contents."
 alias 7za="7z a -t7z -mx=9"
    _7za_description="Compress using 7z with maximum compression settings."
 alias sysupdate="sudo apt update && sudo apt upgrade -y"
@@ -168,9 +196,9 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 alias fn="realpath \$1"
    fn_description="Print the full path of a given file/directory."
 
-alias fp="__fp"
+alias fp="___fp"
    fp_description="Find pid of a given process name."
-function __fp ()
+function ___fp ()
 {
    if [ $# -lt 1 ]; then
       ___cmd_descr "fp" "$fp_description"
@@ -185,7 +213,7 @@ alias cgtk="xclip -sel clip /home/ivan/.config/ivan/git-token.txt && echo Token 
    cgtk_description="Copies the github security token to the clipboard."
 
 # Debian --------------------------------------------------------
-function DebianAliases ()
+function ___debian_aliases ()
 {
    local os_is_ubuntu=0
    local os_is_debian=0
@@ -198,7 +226,7 @@ function DebianAliases ()
         *"Ubuntu"*) os_is_ubuntu=1;;
         *"Debian"*) os_is_debian=1;;
         *"mint"*)   os_is_ubuntu=1;;
-        *) echo "DebianAliases: Unknown linux version.";;
+        *) echo "___debian_aliases: Unknown linux version.";;
       esac
    fi
    if [ $os_is_debian -gt 0 ]; then
@@ -208,7 +236,7 @@ function DebianAliases ()
          reboot_description="Reboot system (like Ubuntu)."
    fi
 }
-DebianAliases
+___debian_aliases
 
 # Mistakes ------------------------------------------------------
 alias car=cat
@@ -271,9 +299,9 @@ fi
 
 # Big aliases ---------------------------------------------------
 # ---------------------------------------------------------------
-alias ft=_ft
+alias ft=___ft
    ft_description="Find text inside files (ignore case, recursive and line numbers)."
-function _ft ()
+function ___ft ()
 {
    if [ $# -lt 1 ]; then
       ___cmd_descr "ft" "$ft_description"
@@ -289,9 +317,9 @@ function _ft ()
 }
 
 # ---------------------------------------------------------------
-alias pdu=_pdu
+alias pdu=___pdu
    pdu_description="Progressive disk usage."
-function _pdu ()
+function ___pdu ()
 {
    local size0=
    local size1=
@@ -329,9 +357,9 @@ function _pdu ()
 }
 
 # ---------------------------------------------------------------
-alias count=_count_files
+alias count=___count_files
    count_description="Count the amount of files and directories recursively in a given path."
-function _count_files ()
+function ___count_files ()
 {
    if [ $# -lt 1 ]; then
       ___cmd_descr "count" "$count_description"
@@ -351,11 +379,11 @@ function _count_files ()
 }
 
 # ---------------------------------------------------------------
-alias chm=_chm
+alias chm=___chm
    chm_description="Change file permissions recursively."
 alias chmn="chm 644"
    chmn_description="Change file permissions to 664 recursively."
-function _chm ()
+function ___chm ()
 {
    if [ $# -lt 1 ]; then
       ___cmd_descr "chm" "$chm_description"
@@ -372,30 +400,30 @@ function _chm ()
 
 # ---------------------------------------------------------------
 # cd shortcuts
-alias go=_go_dir
+alias go=___go_dir
    go_description="cd shortcuts by ID."
-_go_dirs=("gz    :~/doom/ports/gzdoom/current" \
-          "wad   :~/doom/wads" \
-          "docs  :~/Dropbox/Documents" \
-          "save  :~/Dropbox/Apps/Games/_savegames/Active" \
-          "web   :~/Dropbox/Web" \
-          "vm    :~/VM" \
-          "dw    :~/Downloads" \
-          "shared:~/VM/_shared" \
-          "wow   :~/Scripts/wowssses" \
-          "sh    :~/Scripts/sh" \
-          "ivan  :~/.config/ivan" \
-          "eza   :~/.config/eza" \
-          "geany :~/.config/geany" \
-          "xnview:~/.config/xnviewmp" \
-          "conky :~/.config/conky" \
-         )
-function _go_dir ()
+___go_dirs=("gz    :~/doom/ports/gzdoom/current" \
+            "wad   :~/doom/wads" \
+            "docs  :~/Dropbox/Documents" \
+            "save  :~/Dropbox/Apps/Games/_savegames/Active" \
+            "web   :~/Dropbox/Web" \
+            "vm    :~/VM" \
+            "dw    :~/Downloads" \
+            "shared:~/VM/_shared" \
+            "wow   :~/Scripts/wowssses" \
+            "sh    :~/Scripts/sh" \
+            "ivan  :~/.config/ivan" \
+            "eza   :~/.config/eza" \
+            "geany :~/.config/geany" \
+            "xnview:~/.config/xnviewmp" \
+            "conky :~/.config/conky" \
+           )
+function ___go_dir ()
 {
    local id0 n i s id dir c1 c2
 
    id0=$1
-   n=${#_go_dirs[@]}
+   n=${#___go_dirs[@]}
    c1="\e[1m"
    c2="\e[0m"
 
@@ -404,7 +432,7 @@ function _go_dir ()
       ___cmd_usage "go dir-id"
       for (( i=0 ; i<$n ; i++ ));
       do
-         s=${_go_dirs[$i]}
+         s=${___go_dirs[$i]}
          IFS=":"
             set $s
             id=$(___trim $1)
@@ -421,7 +449,7 @@ function _go_dir ()
    else
       for (( i=0 ; i<$n ; i++ ));
       do
-         s=${_go_dirs[$i]}
+         s=${___go_dirs[$i]}
          IFS=":"
             set $s
             id=$(___trim $1)
@@ -436,7 +464,7 @@ function _go_dir ()
    fi
 }
 
-function __complete_go ()
+function ___complete_go ()
 {
    local i n opts cur opts
 
@@ -445,10 +473,10 @@ function __complete_go ()
 
    opts=""
 
-  n=${#_go_dirs[@]}
+  n=${#___go_dirs[@]}
    for (( i=0 ; i<$n ; i++ ));
    do
-      s=${_go_dirs[$i]}
+      s=${___go_dirs[$i]}
       IFS=":"
          set $s
          id=$(___trim $1)
@@ -459,7 +487,7 @@ function __complete_go ()
    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
    return 0
 }
-complete -F __complete_go go
+complete -F ___complete_go go
 
 # ---------------------------------------------------------------
 alias desktop_link=_desktop_link
@@ -579,7 +607,7 @@ function ___print_alias ()
    fi
 }
 
-function __complete_all ()
+function ___complete_all ()
 {
    local cur opts
 
@@ -601,7 +629,7 @@ function __complete_all ()
 # https://unix.stackexchange.com/questions/4219/how-do-i-get-bash-completion-for-command-aliases
 
 # `all` <tab> <tab> would show autocomplete above wordlist
-complete -F __complete_all all
+complete -F ___complete_all all
 # [Verificatio needed] If you want simplest wordlist, use below instead:
 #complete -W "help verbose version" all
 
