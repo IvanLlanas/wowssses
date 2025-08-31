@@ -98,7 +98,7 @@ function ___editors_aliases ()
    local editors_name=(  "kate"          "geany"          "tilde"          "nano"          )
    local editors_file=(  "/usr/bin/kate" "/usr/bin/geany" "/usr/bin/tilde" "/usr/bin/nano" )
    local editors_alias=( "___kate"       "geany"          "tilde"          "nano"          )
-   local editors_pref=(  "Preferred"     "Alternative"    "Console"        "console" )
+   local editors_pref=(  "Preferred"     "Alternative"    "Console"        "Console"       )
 
    local i n num q_index variable
 
