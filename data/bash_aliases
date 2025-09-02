@@ -100,7 +100,7 @@ function ___editors_aliases ()
    local editors_alias=( "___kate"       "geany"          "tilde"          "nano"          )
    local editors_pref=(  "Preferred"     "Alternative"    "Console"        "Console"       )
 
-   local i n num q_index variable
+   local i n num num2 q_index variable
 
    i=0
    n=${#editors_name[@]}
@@ -120,7 +120,8 @@ function ___editors_aliases ()
 
          alias "q$num"="${editors_alias[$i]}"
          variable=q$num"_description"
-         eval ${variable}=${editors_pref[$i]}"\ text\ editor\ \("${editors_name[$i]}"\)."
+         let num2=q_index-1
+         eval ${variable}=${editors_pref[$num2]}"\ text\ editor\ \("${editors_name[$i]}"\)."
          let q_index++
       fi
    done
