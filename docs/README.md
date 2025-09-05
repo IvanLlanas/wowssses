@@ -3,7 +3,7 @@
      \   \/\/  /  _ \  \/\/   /____  \_____  \_____  \   ___/______  \
       \       (  (_) )       /        \       \       \       \       \
        \__/\  /\____/\__/\  /_______  /_____  /_____  /_____  /_____  /
-            \/            \/        \/      \/      \/      \/      \/ 2.3
+            \/            \/        \/      \/      \/      \/      \/ 2.4
 
 # _World of Warcraft_ Server Script System Environment Setup
 [Github repository](https://github.com/IvanLlanas/wowssses)

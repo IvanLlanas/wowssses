@@ -4,7 +4,7 @@
 #    \   \/\/  /  _ \  \/\/   /____  \_____  \_____  \   ___/______  \
 #     \       (  (_) )       /        \       \       \       \       \
 #      \__/\  /\____/\__/\  /_______  /_____  /_____  /_____  /_____  /
-#           \/            \/        \/      \/      \/      \/      \/ 2.3
+#           \/            \/        \/      \/      \/      \/      \/ 2.4
 # ------------------------------------------------------------------------------
 # World of Warcraft Server Script System Environment Setup
 # (C) Copyright by Ivan Llanas, 2023-25
@@ -18,8 +18,8 @@
 
 cons_lit_product_name_short="WoWSSSES"
 cons_lit_product_name_long="World of Warcraft Server Script System Environment Setup"
-cons_lit_product_version="2.3"
-cons_lit_product_date="2025-08-27"
+cons_lit_product_version="2.4"
+cons_lit_product_date="2025-09-06"
 
 # Move to the script location.
 cd "$(dirname "$0")"
@@ -64,6 +64,7 @@ path_conky="$path_data/conky"
 path_media="../../media"
 path_grub="$path_media/grub"
 path_bootui="$path_media/boot-ui"
+path_logos="$path_media/logos"
 path_login="$path_media/login"
 path_wallpapers="$path_media/wallpapers"
 path_avatars="$path_media/avatars"
@@ -639,6 +640,12 @@ function setup_boot_logos ()
       # so you need to apply:
       print_info "Updating initramfs..."
       sudo update-initramfs -u
+
+      # Images used in the gnome-control-center about panel
+      backup_file "/usr/share/pixmaps/ubuntu-logo-text.png"
+      sudo cp $path_logos/ubuntu-logo-text.png     /usr/share/pixmaps/ubuntu-logo-text.png
+      backup_file "/usr/share/pixmaps/ubuntu-logo-text-dark.png"
+      sudo cp $path_logos/ubuntu-logo-text.png     /usr/share/pixmaps/ubuntu-logo-text-dark.png
    fi
    CR
 }
