@@ -1,14 +1,51 @@
+# ----------------------------------------------------------------------
 # Ivan Llanas Aliases System
+# ----------------------------------------------------------------------
+# Internal constants start with '_'.
+# Internal functions start with '___'.
+# ----------------------------------------------------------------------
 
 _product_name="Ivan Llanas Aliases System"
-_product_version="2.0"
+_product_version="2.1"
 
-echo [$_product_name $_product_version] loading...
+_ansi_off="\e[0m"
+_ansi_black="\e[90m"
+_ansi_gray="\e[37m"
+_ansi_cyan="\e[96m"
+_ansi_white="\e[97m"
+_ansi_yellow="\e[93m"
+_ansi_bg_default="\e[49m"
+_ansi_bg_red="\e[41m"
+_ansi_bg_blue="\e[44m"
+
+_bold1='<b>'
+_bold0='</b>'
+
+_quote1="<"
+_quote2=">"
+_quotel1="["
+_quotel2="]"
+
+_error_n=$_ansi_white
+_error_b=$_ansi_yellow
+_error_bg=$_ansi_bg_red
+_info_n=$_ansi_white
+_info_b=$_ansi_yellow
+_info_bg=$_ansi_bg_default
+_infoline_n=$_ansi_white
+_infoline_b=$_ansi_cyan
+_infoline_bg=$_ansi_bg_blue
+_skip_n=$_ansi_black
+_skip_b=$_ansi_gray
+_skip_bg=$_ansi_bg_default
+
+_find_trash_color="light:red"
+_find_home_color="light:cyan"
 
 #export LC_ALL="C" # Breaks unicode characters!
 export LS_COLORS=""
 # Backup IFS to restore it whenever is changed.
-IFS0=$IFS
+_IFS0=$IFS
 
 # Aliases support functions --------------------------------------------
 function ___cmd_descr ()
@@ -28,15 +65,75 @@ function ___cmd_usage ()
    echo -e " Usage: "$b1$bg1 $1 $b0
 }
 
-function ___cmd_error ()
+function ___print_error ()
 {
-   local b1='\e[37m'
-   local b2='\e[1;33m'
-   local b0='\e[0m'
-   local bg='\e[41m'
+   local command=$1
+   local text=$2
 
-   echo -e -n $bg$b1" Error: "$b2$1$b0
-   echo -e    $bg$b1" - "$2" "$b0
+   text=${text//$_bold1/$_error_b}
+   text=${text//$_bold0/$_error_n}
+
+   echo -e "$_error_b$_error_bg $command$_error_n: $text $_ansi_off"
+}
+
+function ___print_info_line ()
+{
+   local text=$1
+
+   text=${text//$_bold1/$_infoline_b}
+   text=${text//$_bold0/$_infoline_n}
+
+   echo -e "$_infoline_n$_infoline_bg $_quotel1 $text $_quotel2 $_ansi_off"
+}
+
+function ___print_skip ()
+{
+   local text=$1
+
+   text=${text//$_bold1/$_skip_b}
+   text=${text//$_bold0/$_skip_n}
+
+   echo -e "$_skip_n$_skip_bg $text $_ansi_off"
+}
+
+function ___print_info ()
+{
+   local text=$1
+
+   text=${text//$_bold1/$_info_b}
+   text=${text//$_bold0/$_info_n}
+
+   echo -e "$_info_n$_info_bg $text $_ansi_off"
+}
+
+function ___print_info_start ()
+{
+   local text=$1
+
+   text=${text//$_bold1/$_info_b}
+   text=${text//$_bold0/$_info_n}
+
+   echo -en "$_info_n$_info_bg $text"
+}
+
+function ___print_info_mid ()
+{
+   local text=$1
+
+   text=${text//$_bold1/$_info_b}
+   text=${text//$_bold0/$_info_n}
+
+   echo -en "$_info_n$_info_bg$text"
+}
+
+function ___print_info_end ()
+{
+   local text=$1
+
+   text=${text//$_bold1/$_info_b}
+   text=${text//$_bold0/$_info_n}
+
+   echo -e "$_info_n$_info_bg$text$_ansi_off"
 }
 
 function ___trim ()
@@ -56,6 +153,18 @@ function ___trim ()
 }
 
 # ----------------------------------------------------------------------
+___print_info_line "<b>$_product_name $_ansi_yellow$_product_version</b> loading..."
+___print_info "Session type: <b>$XDG_SESSION_TYPE</b>"
+# ----------------------------------------------------------------------
+
+# Is bline installed?
+if test -f "/bin/bline"; then
+   _BLINE=true
+   ___print_info "<b>bline</b> found."
+else
+   _BLINE=false
+   ___print_skip "<b>bline</b> not found."
+fi
 
 # Common aliases
 alias eal="q ~/.bash_aliases"
@@ -96,7 +205,7 @@ alias l="less"
 function ___editors_aliases ()
 {
    local editors_name=(  "kate"          "geany"          "tilde"          "nano"          )
-   local editors_file=(  "/usr/bin/kate" "/usr/bin/geany" "/usr/bin/tilde" "/usr/bin/nano" )
+   local editors_file=(  "/bin/kate"     "/bin/geany"     "/bin/tilde"     "/bin/nano"     )
    local editors_alias=( "___kate"       "geany"          "tilde"          "nano"          )
    local editors_pref=(  "Preferred"     "Alternative"    "Console"        "Console"       )
 
@@ -106,7 +215,7 @@ function ___editors_aliases ()
    n=${#editors_name[@]}
    q_index=1
 
-   echo -n "Q-Editors: "
+   ___print_info_start "Q-Editors: "
    for (( i=0 ; i<$n ; i++ ));
    do
       if test -f "${editors_file[$i]}"; then
@@ -114,9 +223,9 @@ function ___editors_aliases ()
             num=""
          else
             num=$q_index
-            echo -n ", "
+            ___print_info_mid ", "
          fi
-         echo -n ${editors_name[$i]}"($q_index)"
+         ___print_info_mid "$_bold1"${editors_name[$i]}$_bold0"($q_index)"
 
          alias "q$num"="${editors_alias[$i]}"
          variable=q$num"_description"
@@ -125,7 +234,7 @@ function ___editors_aliases ()
          let q_index++
       fi
    done
-   echo "."
+   ___print_info_end "."
 }
 ___editors_aliases
 
@@ -186,7 +295,13 @@ alias bat="upower -i /org/freedesktop/UPower/devices/battery_BAT0"
    bat_description="Show battery status."
 alias fstab="sudo nano /etc/fstab"
    fstab_description="Edit /etc/fstab using nano."
-alias mnt="mount | awk -F' ' '{ printf \"%s\t%s\n\",\$1,\$3; }' | column -t | egrep ^/dev/ | sort"
+
+if $_BLINE ; then
+   alias mnt="mount | awk -F' ' '{ printf \"%s\t%s\n\",\$1,\$3; }' | column -t | egrep ^/dev/ | sort | bline -m $HOME $_find_home_color"
+else
+   alias mnt="mount | awk -F' ' '{ printf \"%s\t%s\n\",\$1,\$3; }' | column -t | egrep ^/dev/ | sort"
+fi
+
    mnt_description="Show device mounts."
 alias mnts="mount | awk -F' ' '{ printf \"%s\t%s\n\",\$1,\$3; }' | column -t | egrep ^/var/ | sort"
    mnts_description="Show snap mounts."
@@ -233,7 +348,7 @@ function ___debian_aliases ()
         *"Ubuntu"*) os_is_ubuntu=1;;
         *"Debian"*) os_is_debian=1;;
         *"mint"*)   os_is_ubuntu=1;;
-        *) echo "___debian_aliases: Unknown linux version.";;
+        *) ___print_error "___debian_aliases" "Unknown linux version [<b>$osname</b>].";;
       esac
    fi
    if [ $os_is_debian -gt 0 ]; then
@@ -241,6 +356,7 @@ function ___debian_aliases ()
          poweroff_description="Poweroff system (like Ubuntu)."
       alias reboot="sudo systemctl reboot"
          reboot_description="Reboot system (like Ubuntu)."
+      ___print_info "<b>Debian power</b> aliases added."
    fi
 }
 ___debian_aliases
@@ -252,30 +368,49 @@ alias cay=cat
    cay_description=$car_description
 
 # CC ------------------------------------------------------------
-alias saveall="$HOME/Scripts/sh/save_all.sh"
-   saveall_description="Make a backup of all meaningful configurations."
+_save_all_script="$HOME/Scripts/sh/$HOSTNAME-save-all.sh"
+if test -f "$_save_all_script"; then
+   alias saveall="$_save_all_script"
+      saveall_description="Make a backup of all meaningful configurations."
+   ___print_info "<b>Backup script</b> found."
+else
+   ___print_skip "<b>Backup script</b> not found $_quote1$_save_all_script$_quote2."
+fi
 
 # INAS ----------------------------------------------------------
-alias smbed="sudo nano /etc/samba/smb.conf"
-   smbed_description="Edit samba configuration file."
-alias smbcheck="sudo systemctl status smbd"
-   smbcheck_description="Show samba service status."
-alias smbrestart="sudo service smbd restart"
-   smbrestart_description="Restart samba service."
+if test -f "/etc/samba/smb.conf"; then
+   alias smbed="sudo nano /etc/samba/smb.conf"
+      smbed_description="Edit samba configuration file."
+   alias smbcheck="sudo systemctl status smbd"
+      smbcheck_description="Show samba service status."
+   alias smbrestart="sudo service smbd restart"
+      smbrestart_description="Restart samba service."
+   ___print_info "<b>Samba</b> aliases added."
+else
+   ___print_skip "<b>Samba</b> not found."
+fi
 
 # Apps ----------------------------------------------------------
-alias matrix="gnome-terminal --window-with-profile=Matrix --full-screen -- cmatrix -b"
-   matrix_description="Start full Matrix screensaver."
-# kmatrix - Mind the single quote!
-alias kmatrix='kill $(pidof cmatrix)'
-   kmatrix_description="Kill Matrix screensaver (if Q does not quit)."
+if test -f "/bin/cmatrix"; then
+   alias matrix="gnome-terminal --window-with-profile=Matrix --full-screen -- cmatrix -b"
+      matrix_description="Start full Matrix screensaver."
+   # kmatrix - Mind the single quote!
+   alias kmatrix='kill $(pidof cmatrix)'
+      kmatrix_description="Kill Matrix screensaver (if Q does not quit)."
+   ___print_info "<b>cmatrix</b> aliases added."
+fi
 
-alias xc=xclip-copyfile
-   xc_description="Copy file(s) to the clipboard (only to console!)."
-alias xx=xclip-cutfile
-   xx_description="Cut file(s) to the clipboard (only to console!)."
-alias xv=xclip-pastefile
-   xv_description="Paste file(s) from the clipboard (only from console!)."
+if test -f "/bin/xclip-cutfile"; then
+   alias xc=xclip-copyfile
+      xc_description="Copy file(s) to the clipboard (only to console!)."
+   alias xx=xclip-cutfile
+      xx_description="Cut file(s) to the clipboard (only to console!)."
+   alias xv=xclip-pastefile
+      xv_description="Paste file(s) from the clipboard (only from console!)."
+   ___print_info "<b>xclip</b> aliases added."
+else
+   ___print_skip "<b>xclip</b> not found."
+fi
 
 # GZDoom --------------------------------------------------------
 if test -f "$HOME/doom/ports/gzdoom/current/gzdoom"; then
@@ -284,23 +419,30 @@ if test -f "$HOME/doom/ports/gzdoom/current/gzdoom"; then
       gz_description="Launch GZDoom with \"portable\" settings file."
    alias gzx="gz xs.pk3 bfriend1.pk3 levelinfo.pk3"
       gzx_description="Launch GZDoom with \"portable\" settings file and XS wad(s)."
+   ___print_info "<b>GZDoom</b> aliases added."
+else
+   ___print_skip "<b>GZDoom</b> not found."
 fi
 
 # WoWSSS server -------------------------------------------------
 if test -f "$HOME/wowsss/wowsss/wowsss.sh"; then
    alias wow="$HOME/wowsss/start.sh"
       wow_description="Launch WoWSSS."
+   echo "<b>WoWSSS</b> aliases added."
 fi
 
 # ---------------------------------------------------------------
 fr_description="Show memory and disk usage."
 if test -d "/shared/videoteca"; then
       alias fr="echo && free -h && echo && df -h / /shared/videoteca /shared/filter && echo"
+      ___print_info "<b>INAS fr</b> alias added."
 else
    if [ $HOSTNAME = "cc" ]; then
       alias fr="echo && free -h && echo && df -h / $HOME/Dropbox $HOME/VM $HOME/store && echo"
+      ___print_info "<b>CC fr</b> alias added."
    else
       alias fr="echo && free -h && echo && df -h / && echo"
+      ___print_info "<b>Base fr</b> alias added."
    fi
 fi
 
@@ -319,9 +461,37 @@ function ___ft ()
       if [ $# -lt 2 ]; then
          path="."
       fi
-      grep -rni "$text" "$path"
+      path=$(realpath "$path")
+      if $_BLINE ; then
+         grep -rni "$text" "$path" | bline -m .Trash-1000 $_find_trash_color | bline -m $HOME $_find_home_color
+      else
+         grep -rni "$text" "$path"
+      fi
    fi
 }
+
+alias ff=___ff
+   ff_description="Find files."
+function ___ff ()
+{
+   if [ $# -lt 1 ]; then
+      ___cmd_descr "ff" "$ff_description"
+      ___cmd_usage "ff name-pattern [path=.]"
+   else
+      local pattern=$1
+      local path=$2
+      if [ $# -lt 2 ]; then
+         path="."
+      fi
+      path=$(realpath "$path")
+      if $_BLINE ; then
+         find "$path" -name "$pattern" 2>/dev/null | bline -m .Trash-1000 $_find_trash_color | bline -m $HOME $_find_home_color
+      else
+         find "$path" -name "$pattern" 2>/dev/null
+      fi
+   fi
+}
+# find -P -name gnome-control-center 2>/dev/null
 
 # ---------------------------------------------------------------
 alias pdu=___pdu
@@ -444,7 +614,7 @@ function ___go_dir ()
             set $s
             id=$(___trim $1)
             dir=$2
-         IFS=$IFS0
+         IFS=$_IFS0
 
          printf "       go "
          echo -e -n $c1
@@ -461,13 +631,13 @@ function ___go_dir ()
             set $s
             id=$(___trim $1)
             dir=$2
-         IFS=$IFS0
+         IFS=$_IFS0
          if [ "$id" = "$id0" ]; then
             cd "${dir/\~/$HOME}"
             return
          fi
       done
-      ___cmd_error "go" "Dir-id <$id0> not found."
+      ___print_error "go" "dir-id $_quote1<b>$id0</b>$_quote2 not found."
    fi
 }
 
@@ -487,7 +657,7 @@ function ___complete_go ()
       IFS=":"
          set $s
          id=$(___trim $1)
-      IFS=$IFS0
+      IFS=$_IFS0
       opts="$opts $id"
    done
 
@@ -531,7 +701,7 @@ function _list_aliases ()
       if [ "$cmd" != "?" ]; then
          local cmdv=${BASH_ALIASES[$cmd]}
          if [ "$cmdv" = "" ]; then
-            ___cmd_error "all" "Unknown alias <$cmd>."
+            ___print_error "all" "Unknown alias $_quote1<b>$cmd$_quote2</b>."
          else
             ___print_alias 1 0 $cmd
             return
@@ -640,4 +810,12 @@ complete -F ___complete_all all
 # [Verificatio needed] If you want simplest wordlist, use below instead:
 #complete -W "help verbose version" all
 
-echo [$_product_name $_product_version] loaded.
+___print_info_line "<b>$_product_name $_ansi_yellow$_product_version</b> loaded."
+
+
+# pretty ()
+# {
+#     while read -r line; do
+#         printf "\033[38;5;%dm%s\033[0m\n" $(($RANDOM%255)) "$line";
+#     done
+# }

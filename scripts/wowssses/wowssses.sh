@@ -643,9 +643,9 @@ function setup_boot_logos ()
 
       # Images used in the gnome-control-center about panel
       backup_file "/usr/share/pixmaps/ubuntu-logo-text.png"
-      sudo cp $path_logos/ubuntu-logo-text.png     /usr/share/pixmaps/ubuntu-logo-text.png
+      sudo cp $path_logos/ubuntu-logo-text.png       /usr/share/pixmaps/ubuntu-logo-text.png
       backup_file "/usr/share/pixmaps/ubuntu-logo-text-dark.png"
-      sudo cp $path_logos/ubuntu-logo-text.png     /usr/share/pixmaps/ubuntu-logo-text-dark.png
+      sudo cp $path_logos/ubuntu-logo-text-dark.png  /usr/share/pixmaps/ubuntu-logo-text-dark.png
    fi
    CR
 }
