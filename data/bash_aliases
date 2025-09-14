@@ -6,7 +6,8 @@
 # ----------------------------------------------------------------------
 
 _product_name="Ivan Llanas Aliases System"
-_product_version="2.1"
+_product_version="2.2"
+_product_build="103"
 
 _ansi_off="\e[0m"
 _ansi_bold="\e[1m"
@@ -159,7 +160,7 @@ function ___trim ()
 }
 
 # ----------------------------------------------------------------------
-___print_info_line "<b>$_product_name $_ansi_lyellow$_product_version</b> loading..."
+___print_info_line "<b>$_product_name $_ansi_lyellow$_product_version</b> ($_ansi_lyellow$_product_build</b>) loading..."
 # ----------------------------------------------------------------------
 
 # Is bline installed?
@@ -186,6 +187,10 @@ alias .....="cd ../../../.."
    ______description="Move four directories above."
 alias ......="cd ../../../../.."
    _______description="Move five directories above."
+alias md=mkdir
+   md_description="Create a directory."
+alias rd=rmdir
+   rd_description="Delete an empty directory."
 alias mk="_mk"
    mk_description="Create a directory an enter."
 function _mk ()
@@ -220,7 +225,11 @@ alias rx="rar x"
    rx_description="Extract archive contents."
 alias 7za="7z a -t7z -mx=9"
    _7za_description="Compress using 7z with maximum compression settings."
-alias sysupdate="sudo apt update && sudo apt upgrade -y"
+alias supdate="sudo apt update && apt list --upgradable"
+   supdate_description="Check packages to update."
+alias supgrade="sudo apt upgrade -y"
+   supgrade_description="Update the current packages."
+alias sysupdate="supdate && supgrade"
    sysupdate_description="Update everything. No questions."
 alias clearhistory="cat /dev/null > ~/.bash_history && history -c"
    clearhistory_description="Delete the shell history from memory and disk."
@@ -283,10 +292,10 @@ fi
 
 if test -f "$HOME/doom/ports/gzdoom/current/gzdoom"; then
    GZDOOMDIR="$HOME/doom/ports/gzdoom/current"
-   alias gz="$GZDOOMDIR/gzdoom -config $GZDOOMDIR/gzdoom.ini -file"
-      gz_description="Launch GZDoom with \"portable\" settings file."
-   alias gzx="gz xs.pk3 bfriend1.pk3 levelinfo.pk3"
-      gzx_description="Launch GZDoom with \"portable\" settings file and XS wad(s)."
+   alias doom="$GZDOOMDIR/gzdoom -config $GZDOOMDIR/gzdoom.ini -file"
+      doom_description="Launch GZDoom with \"portable\" settings file."
+   alias doomz="doom xs.pk3 bfriend1.pk3 levelinfo.pk3"
+      doomz_description="Launch GZDoom with \"portable\" settings file and XS wad(s)."
    ___print_info "<b>GZDoom</b> aliases added."
 else
    ___print_skip "<b>GZDoom</b> not found."
@@ -477,15 +486,12 @@ function ___os_version ()
       ___print_info  "<b>$XDG_SESSION_TYPE</b> (<b>$XDG_SESSION_DESKTOP</b>) session on $gdm_name"
 
       if [[ $gdm_name == *"GNOME"* ]]; then
-         local gv=$(gnome-shell --version)
-         echo " "$gv
+         gnome-shell --version | sed 's/^/ /'
       fi
-#       case $var_os_name in
-#         *"Ubuntu"*) var_os_is_ubuntu=1;;
-#         *"Debian"*) var_os_is_debian=1;;
-#         *"mint"*)   var_os_is_ubuntu=1;;
-#         *) print_fatal_error "$cons_msg_unknown_linux_version";;
-#       esac
+      if [[ $gdm_name == *"KDE"* ]]; then
+         plasmashell  --version | sed 's/^/ /'
+         kf5-config --version | sed 's/^/ /'
+      fi
    else
       ___print_info "Unknown OS version."
    fi
@@ -561,13 +567,11 @@ function ___pdu ()
    fi
 
    echo Progressive disk usage in \"$path\" "($update seconds update)":
-
-   local cmd="du $path -s $mode"
-   read size0 _ < <($cmd 2> /dev/null)
-   echo
+   # du "$path" -s "$mode"
+   read size0 _ < <(du "$path" "-s" "$mode" 2> /dev/null)
 
    while true ; do
-      read size1 _ < <($cmd 2> /dev/null)
+      read size1 _ < <(du "$path" "-s" "$mode" 2> /dev/null)
       let size=size1-size0
       printf "\r   %'.3d / %'.3d " $size $size0
       sleep $update
@@ -842,10 +846,12 @@ function ___complete_all ()
 
 # `all` <tab> <tab> would show autocomplete above wordlist
 complete -F ___complete_all all
-# [Verificatio needed] If you want simplest wordlist, use below instead:
-#complete -W "help verbose version" all
+# [Verification needed] If you want simplest wordlist, use below instead:
+# complete -W "help verbose version" all
 
-___print_info_line "<b>$_product_name $_ansi_lyellow$_product_version</b> loaded."
+# ----------------------------------------------------------------------
+___print_info_line "<b>$_product_name $_ansi_lyellow$_product_version</b> ($_ansi_lyellow$_product_build</b>) loaded."
+# ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
 # Change color of command console output.
