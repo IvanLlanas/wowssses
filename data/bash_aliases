@@ -1,3 +1,4 @@
+#!/bin/bash
 # ----------------------------------------------------------------------
 # Ivan Llanas Aliases System
 # ----------------------------------------------------------------------
@@ -5,144 +6,184 @@
 # Internal functions start with '___'.
 # ----------------------------------------------------------------------
 
-_product_name="Ivan Llanas Aliases System"
-_product_version="2.2"
-_product_build="103"
+_ilas_name='Ivan Llanas Aliases System'
+_ilas_version='2.4'
+_ilas_build=125
 
-_ansi_off="\e[0m"
-_ansi_bold="\e[1m"
-
-_ansi_gray="\e[37m"
-_ansi_green="\e[32m"
-
-_ansi_lblack="\e[90m"
-_ansi_lgreen="\e[92m"
-_ansi_lyellow="\e[93m"
-_ansi_lcyan="\e[96m"
-_ansi_lwhite="\e[97m"
-
-_ansi_bg_default="\e[49m"
-_ansi_bg_red="\e[41m"
-_ansi_bg_blue="\e[44m"
-
-_bold1='<b>'
-_bold0='</b>'
-
-_quote1="<"
-_quote2=">"
-_quotel1="["
-_quotel2="]"
-
-_error_n=$_ansi_lwhite
-_error_b=$_ansi_lyellow
-_error_bg=$_ansi_bg_red
-_info_n=$_ansi_lwhite
-_info_b=$_ansi_lyellow
-_info_bg=$_ansi_bg_default
-_infoline_n=$_ansi_lwhite
-_infoline_b=$_ansi_lcyan
-_infoline_bg=$_ansi_bg_blue
-_skip_n=$_ansi_green
-_skip_b=$_ansi_lgreen
-_skip_bg=$_ansi_bg_default
-
-_find_trash_color="light:red"
-_find_home_color="light:cyan"
-
-#export LC_ALL="C" # Breaks unicode characters!
+# Environment vars -----------------------------------------------------
+#export LC_ALL="C" # Breaks unicode characters with ls but it's ok with eza! Does not let the prompt type accents.
 export LS_COLORS=""
-# Backup IFS to restore it whenever is changed.
+
+# Backup IFS to restore it whenever is it changed.
 _IFS0=$IFS
 
-# Aliases support functions --------------------------------------------
-function ___cmd_descr ()
-{
-   local b1='\e[1m'
-   local b0='\e[0m'
+_scripts_dir="$HOME/Scripts/sh"
 
-   echo -e " "$b1$1$b0" - "$2$b0
-}
+# [conio.sh]------------8<------------8<------------8<------------8<------------8<------------8<------------8<------------
 
-function ___cmd_usage ()
-{
-   local bg1='\e[47m'
-   local b1='\e[0;30m'
-   local b0='\e[0m'
+# conio.sh - Console Input/Output routines
 
-   echo -e " Usage: "$b1$bg1 $1 $b0
-}
+# [LICENSE]-----------------------------------------------------------------------
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2025 Ivan Llanas
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
-function ___print_error ()
-{
-   local command=$1
-   local text=$2
+# function ___trim (text)
+# function ___datetime_to_string (date, [format])
 
-   text=${text//$_bold1/$_error_b}
-   text=${text//$_bold0/$_error_n}
+# function ___print_info (command, [text])
+# function ___print_info_bg (command, [text])
+# function ___print_warning (command, [text])
+# function ___print_warning_bg (command, [text])
+# function ___print_error (command, [text])
+# function ___print_error_bg (command, [text])
+# function ___print_disabled (command, [text])
+# function ___print_disabled_bg (command, [text])
+# function ___print_url (url, [text], [color])
 
-   echo -e "$_error_b$_error_bg $command$_error_n: $text $_ansi_off"
-}
+# ANSI colors ----------------------------------------------------------
 
-function ___print_info_line ()
-{
-   local text=$1
+_ansi_off='\e[0m'
+_ansi_bold='\e[1m'
 
-   text=${text//$_bold1/$_infoline_b}
-   text=${text//$_bold0/$_infoline_n}
+_ansi_default='\e[39m'
+_ansi_bg_default='\e[49m'
 
-   echo -e "$_ansi_bold$_infoline_n$_infoline_bg $_quotel1 $text $_quotel2 $_ansi_off"
-}
+_ansi_black='\e[30m'
+_ansi_red='\e[31m'
+_ansi_green='\e[32m'
+_ansi_yellow='\e[33m'
+_ansi_blue='\e[34m'
+_ansi_magenta='\e[35m'
+_ansi_cyan='\e[36m'
+_ansi_white='\e[37m'
 
-function ___print_skip ()
-{
-   local text=$1
+_ansi_lblack='\e[90m'
+_ansi_lred='\e[91m'
+_ansi_lgreen='\e[92m'
+_ansi_lyellow='\e[93m'
+_ansi_lblue='\e[94m'
+_ansi_lmagenta='\e[95m'
+_ansi_lcyan='\e[96m'
+_ansi_lwhite='\e[97m'
 
-   text=${text//$_bold1/$_skip_b}
-   text=${text//$_bold0/$_skip_n}
+_ansi_bg_black='\e[40m'
+_ansi_bg_red='\e[41m'
+_ansi_bg_green='\e[42m'
+_ansi_bg_yellow='\e[43m'
+_ansi_bg_blue='\e[44m'
+_ansi_bg_magenta='\e[45m'
+_ansi_bg_cyan='\e[46m'
+_ansi_bg_white='\e[47m'
 
-   echo -e "$_skip_n$_skip_bg $text $_ansi_off"
-}
+_ansi_bg_lblack='\e[100m'
+_ansi_bg_lred='\e[101m'
+_ansi_bg_lgreen='\e[102m'
+_ansi_bg_lyellow='\e[103m'
+_ansi_bg_lblue='\e[104m'
+_ansi_bg_lmagenta='\e[105m'
+_ansi_bg_lcyan='\e[106m'
+_ansi_bg_lwhite='\e[107m'
 
-function ___print_info ()
-{
-   local text=$1
+# Emphasis -------------------------------------------------------------
+_em0='<0>'
+_em1='<1>'
+_em2='<2>'
+_em3='<3>'
 
-   text=${text//$_bold1/$_info_b}
-   text=${text//$_bold0/$_info_n}
+# Brackets -------------------------------------------------------------
+# Canviar per brak_a1 brak_b1
+_quote1='<'
+_quote2='>'
+_quotel1='['
+_quotel2=']'
 
-   echo -e "$_info_n$_info_bg $text $_ansi_off"
-}
+# _print_info colors ---------------------------------------------------
+_info_c0=$_ansi_lwhite
+_info_c1=$_ansi_lyellow
+_info_c2=$_ansi_lcyan
+_info_c3=$_ansi_lgreen
+_info_bg=$_ansi_bg_default
 
-function ___print_info_start ()
-{
-   local text=$1
+# _print_info_bg colors ------------------------------------------------
+_infobg_c0=$_ansi_lwhite
+_infobg_c1=$_ansi_lcyan
+_infobg_c2=$_ansi_lyellow
+_infobg_c3=$_ansi_lgreen
+_infobg_bg=$_ansi_bg_blue
 
-   text=${text//$_bold1/$_info_b}
-   text=${text//$_bold0/$_info_n}
+# _print_warning colors -----------------------------------------------
+_warning_c0=$_ansi_lyellow
+_warning_c1=$_ansi_lwhite
+_warning_c2=$_ansi_lcyan
+_warning_c3=$_ansi_lgreen
+_warning_bg=$_ansi_bg_default
 
-   echo -en "$_info_n$_info_bg $text"
-}
+# _print_warning_bg colors --------------------------------------------
+_warningbg_c0=$_ansi_black
+_warningbg_c1=$_ansi_red
+_warningbg_c2=$_ansi_blue
+_warningbg_c3=$_ansi_green
+_warningbg_bg=$_ansi_bg_lyellow
 
-function ___print_info_mid ()
-{
-   local text=$1
+# _print_error colors --------------------------------------------------
+_error_c0=$_ansi_lred
+_error_c1=$_ansi_lyellow
+_error_c2=$_ansi_lcyan
+_error_c3=$_ansi_lgreen
+_error_bg=$_ansi_bg_default
 
-   text=${text//$_bold1/$_info_b}
-   text=${text//$_bold0/$_info_n}
+# _print_error_bg colors -----------------------------------------------
+_errorbg_c0=$_ansi_lwhite
+_errorbg_c1=$_ansi_lyellow
+_errorbg_c2=$_ansi_lcyan
+_errorbg_c3=$_ansi_lgreen
+_errorbg_bg=$_ansi_bg_red
 
-   echo -en "$_info_n$_info_bg$text"
-}
+# _print_disabled colors -----------------------------------------------
+_disabled_c0=$_ansi_green
+_disabled_c1=$_ansi_lgreen
+_disabled_c2=$_ansi_lyellow
+_disabled_c3=$_ansi_lcyan
+_disabled_bg=$_ansi_bg_default
 
-function ___print_info_end ()
-{
-   local text=$1
+# _print_disabled_bg colors --------------------------------------------
+_disabledbg_c0=$_ansi_lwhite
+_disabledbg_c1=$_ansi_lyellow
+_disabledbg_c2=$_ansi_lcyan
+_disabledbg_c3=$_ansi_lgreen
+_disabledbg_bg=$_ansi_bg_green
 
-   text=${text//$_bold1/$_info_b}
-   text=${text//$_bold0/$_info_n}
+# _print_info_bg colors ------------------------------------------------
+_date_format_filename='%Y-%m-%d'
+_datetime_format_filename=$_date_format_filename'__%H-%M-%S'
+_date_format_screen='%Y/%m/%d'
+_datetime_format_screen="$_date_format_screen %H:%M:%S"
+_datetime_format_default="$_datetime_format_screen"
 
-   echo -e "$_info_n$_info_bg$text$_ansi_off"
-}
+# String functions -----------------------------------------------------
 
+# function ___trim (text)
+# Removes leading and trailing spaces from string.
 function ___trim ()
 {
    local s=$1
@@ -153,23 +194,262 @@ function ___trim ()
    s="${s##*( )}"
    ## Trim trailing whitespaces
    s="${s%%*( )}"
-   # 5. Print final result
-   echo $s
    # Turn off the extglob shell option
    shopt -u extglob
+   # Print final result
+   echo $s
+}
+
+# function ___datetime_to_string (date, [format])
+# Formats a given date time with a given datetime format string.
+function ___datetime_to_string ()
+{
+   local dt="$1"
+   local fmt="$2"
+
+   if [ "$fmt" = "" ]; then
+      fmt="$_datetime_format_default"
+   fi
+   echo $(date -d@$dt "+$fmt")
+#  echo $(date -d@$dt '+%Y/%m/%d %H:%M:%S')
+}
+
+# function ___print_info (command, [text])
+# function ___print_info_bg (command, [text])
+# Prints an information message.
+function ___print_info ()
+{
+   local command=$1
+   local text=$2
+
+   command=${command//$_em3/$_info_c3}
+   command=${command//$_em2/$_info_c2}
+   command=${command//$_em1/$_info_c1}
+   command=${command//$_em0/$_info_c0}
+
+   if [ "$text" = "" ]; then
+      echo -e "$_info_c0$_info_bg $command $_ansi_off"
+   else
+      text=${text//$_em3/$_info_c3}
+      text=${text//$_em2/$_info_c2}
+      text=${text//$_em1/$_info_c1}
+      text=${text//$_em0/$_info_c0}
+
+      echo -e "$_info_c1$_info_bg $command$_info_c0: $text $_ansi_off"
+   fi
+}
+
+function ___print_info_bg ()
+{
+   local command=$1
+   local text=$2
+
+   command=${command//$_em3/$_infobg_c3}
+   command=${command//$_em2/$_infobg_c2}
+   command=${command//$_em1/$_infobg_c1}
+   command=${command//$_em0/$_infobg_c0}
+
+   if [ "$text" = "" ]; then
+      echo -e "$_ansi_bold$_infobg_c0$_infobg_bg $command $_ansi_off"
+   else
+      text=${text//$_em3/$_infobg_c3}
+      text=${text//$_em2/$_infobg_c2}
+      text=${text//$_em1/$_infobg_c1}
+      text=${text//$_em0/$_infobg_c0}
+
+      echo -e "$_ansi_bold$_infobg_c1$_infobg_bg $command$_infobg_c0: $text $_ansi_off"
+   fi
+}
+
+# function ___print_warning (command, [text])
+# function ___print_warning_bg (command, [text])
+# Prints a warning message.
+function ___print_warning ()
+{
+   local command=$1
+   local text=$2
+
+   command=${command//$_em3/$_warning_c3}
+   command=${command//$_em2/$_warning_c2}
+   command=${command//$_em1/$_warning_c1}
+   command=${command//$_em0/$_warning_c0}
+
+   if [ "$text" = "" ]; then
+      echo -e "$_warning_c0$_warning_bg $command $_ansi_off"
+   else
+      text=${text//$_em3/$_warning_c3}
+      text=${text//$_em2/$_warning_c2}
+      text=${text//$_em1/$_warning_c1}
+      text=${text//$_em0/$_warning_c0}
+
+      echo -e "$_warning_c1$_warning_bg $command$_warning_c0: $text $_ansi_off"
+   fi
+}
+
+function ___print_warning_bg ()
+{
+   local command=$1
+   local text=$2
+
+   command=${command//$_em3/$_warningbg_c3}
+   command=${command//$_em2/$_warningbg_c2}
+   command=${command//$_em1/$_warningbg_c1}
+   command=${command//$_em0/$_warningbg_c0}
+
+   if [ "$text" = "" ]; then
+      echo -e "$_warningbg_c0$_warningbg_bg $command $_ansi_off"
+   else
+      text=${text//$_em3/$_warningbg_c3}
+      text=${text//$_em2/$_warningbg_c2}
+      text=${text//$_em1/$_warningbg_c1}
+      text=${text//$_em0/$_warningbg_c0}
+
+      echo -e "$_warningbg_c1$_warningbg_bg $command$_warningbg_c0: $text $_ansi_off"
+   fi
+}
+
+# function ___print_error (command, [text])
+# function ___print_error_bg (command, [text])
+# Prints an error message.
+function ___print_error ()
+{
+   local command=$1
+   local text=$2
+
+   command=${command//$_em3/$_error_c3}
+   command=${command//$_em2/$_error_c2}
+   command=${command//$_em1/$_error_c1}
+   command=${command//$_em0/$_error_c0}
+
+   if [ "$text" = "" ]; then
+      echo -e "$_error_c0$_error_bg $command $_ansi_off"
+   else
+      text=${text//$_em3/$_error_c3}
+      text=${text//$_em2/$_error_c2}
+      text=${text//$_em1/$_error_c1}
+      text=${text//$_em0/$_error_c0}
+
+      echo -e "$_error_c1$_error_bg $command$_error_c0: $text $_ansi_off"
+   fi
+}
+
+function ___print_error_bg ()
+{
+   local command=$1
+   local text=$2
+
+   command=${command//$_em3/$_errorbg_c3}
+   command=${command//$_em2/$_errorbg_c2}
+   command=${command//$_em1/$_errorbg_c1}
+   command=${command//$_em0/$_errorbg_c0}
+
+   if [ "$text" = "" ]; then
+      echo -e "$_errorbg_c0$_errorbg_bg $command $_ansi_off"
+   else
+      text=${text//$_em3/$_errorbg_c3}
+      text=${text//$_em2/$_errorbg_c2}
+      text=${text//$_em1/$_errorbg_c1}
+      text=${text//$_em0/$_errorbg_c0}
+
+      echo -e "$_errorbg_c1$_errorbg_bg $command$_errorbg_c0: $text $_ansi_off"
+   fi
+}
+
+# function ___print_disabled (command, [text])
+# function ___print_disabled_bg (command, [text])
+# Prints a disabled (or less important) message.
+function ___print_disabled ()
+{
+   local command=$1
+   local text=$2
+
+   command=${command//$_em3/$_disabled_c3}
+   command=${command//$_em2/$_disabled_c2}
+   command=${command//$_em1/$_disabled_c1}
+   command=${command//$_em0/$_disabled_c0}
+
+   if [ "$text" = "" ]; then
+      echo -e "$_disabled_c0$_disabled_bg $command $_ansi_off"
+   else
+      text=${text//$_em3/$_disabled_c3}
+      text=${text//$_em2/$_disabled_c2}
+      text=${text//$_em1/$_disabled_c1}
+      text=${text//$_em0/$_disabled_c0}
+
+      echo -e "$_disabled_c1$_disabled_bg $command$_disabled_c0: $text $_ansi_off"
+   fi
+}
+
+function ___print_disabled_bg ()
+{
+   local command=$1
+   local text=$2
+
+   command=${command//$_em3/$_disabledbg_c3}
+   command=${command//$_em2/$_disabledbg_c2}
+   command=${command//$_em1/$_disabledbg_c1}
+   command=${command//$_em0/$_disabledbg_c0}
+
+   if [ "$text" = "" ]; then
+      echo -e "$_disabledbg_c0$_disabledbg_bg $command $_ansi_off"
+   else
+      text=${text//$_em3/$_disabledbg_c3}
+      text=${text//$_em2/$_disabledbg_c2}
+      text=${text//$_em1/$_disabledbg_c1}
+      text=${text//$_em0/$_disabledbg_c0}
+
+      echo -e "$_disabledbg_c1$_disabledbg_bg $command$_disabledbg_c0: $text $_ansi_off"
+   fi
+}
+
+# function ___print_url (url, [text], [color])
+# Prints an URL.
+function ___print_url ()
+{
+   local url text color1 color2
+   url="$1"
+   text="$2"
+   color1="$3"
+   color2="$_ansi_off"
+
+   if [ "$text" == "" ]; then
+      text="$url"
+   fi
+
+   if [ "$color1" == "" ]; then
+      printf "\e]8;;$url\e\\$text\e]8;;\e\\"
+   else
+      echo -en $color1
+      printf "\e]8;;$url\e\\$text\e]8;;\e\\"
+      echo -en $color2
+   fi
+}
+
+# [conio.sh]------------8<------------8<------------8<------------8<------------8<------------8<------------8<------------
+
+function ___cmd_descr ()
+{
+   echo -e " "$_ansi_bold$1$_ansi_off" - "$2$_ansi_off
+}
+
+function ___cmd_usage ()
+{
+   echo -e " Usage: "$_ansi_black$_ansi_bg_white $1 $_ansi_off
 }
 
 # ----------------------------------------------------------------------
-___print_info_line "<b>$_product_name $_ansi_lyellow$_product_version</b> ($_ansi_lyellow$_product_build</b>) loading..."
+___print_info_bg "[ <1>$_ilas_name<0> <2>$_ilas_version<0> (<2>$_ilas_build<0>) loading... ]"
 # ----------------------------------------------------------------------
 
 # Is bline installed?
 if test -f "/bin/bline"; then
    _BLINE=true
-   ___print_info "Using <b>bline</b>."
+   _find_trash_color="light:red"
+   _find_home_color="light:cyan"
+   ___print_info "Using <1>bline<0>."
 else
    _BLINE=false
-   ___print_skip "<b>bline</b> not found."
+   ___print_disabled "<1>bline<0> not found."
 fi
 
 # Common aliases
@@ -202,12 +482,16 @@ alias x="exit"
    x_description="Exit shell."
 alias c="clear"
    c_description="Clear console."
-alias d="eza --group-directories-first --header --time-style=\"+%Y.%m.%d %H:%M\" -l"
+alias d="eza --group-directories-first --header --time-style=\"+%Y.%m.%d %H:%M\" --long --icons --bytes"
    d_description="Directory listing, full information."
-alias da="d -a"
+alias dsz="d --total-size"
+   dsz_description="Directory listing, full information, full sizes."
+alias da="d --all"
    da_description="Directory listing, full information, all files."
 alias dg="d --git"
    dg_description="Directory listing, full information, git status."
+alias dx="d *.exe *.EXE *.bat *.BAT 2>/dev/null"
+   dx_description="Directory listing of Windows executables."
 alias l="less"
    l_description="Less."
 
@@ -275,7 +559,9 @@ if test -f "/bin/cmatrix"; then
    # kmatrix - Mind the single quote!
    alias kmatrix='kill $(pidof cmatrix)'
       kmatrix_description="Kill Matrix screensaver (if Q does not quit)."
-   ___print_info "<b>cmatrix</b> aliases added."
+   ___print_info "<1>cmatrix<0> aliases added."
+else
+   ___print_disabled "<1>cmatrix<0> not found."
 fi
 
 if test -f "/bin/xclip-cutfile"; then
@@ -285,40 +571,40 @@ if test -f "/bin/xclip-cutfile"; then
       xx_description="Cut file(s) to the clipboard (only to console!)."
    alias xv=xclip-pastefile
       xv_description="Paste file(s) from the clipboard (only from console!)."
-   ___print_info "<b>xclip</b> aliases added."
+   ___print_info "<1>xclip<0> aliases added."
 else
-   ___print_skip "<b>xclip</b> not found."
+   ___print_disabled "<1>xclip<0> not found."
 fi
 
 if test -f "$HOME/doom/ports/gzdoom/current/gzdoom"; then
-   GZDOOMDIR="$HOME/doom/ports/gzdoom/current"
-   alias doom="$GZDOOMDIR/gzdoom -config $GZDOOMDIR/gzdoom.ini -file"
+   _gzdoom_dir="$HOME/doom/ports/gzdoom/current"
+   alias doom="$_gzdoom_dir/gzdoom -config $_gzdoom_dir/gzdoom.ini -file"
       doom_description="Launch GZDoom with \"portable\" settings file."
    alias doomz="doom xs.pk3 bfriend1.pk3 levelinfo.pk3"
       doomz_description="Launch GZDoom with \"portable\" settings file and XS wad(s)."
-   ___print_info "<b>GZDoom</b> aliases added."
+   ___print_info "<1>GZDoom<0> aliases added."
 else
-   ___print_skip "<b>GZDoom</b> not found."
+   ___print_disabled "<1>GZDoom<0> not found."
 fi
 
 if test -f "$HOME/wowsss/wowsss/wowsss.sh"; then
    alias wow="$HOME/wowsss/start.sh"
       wow_description="Launch WoWSSS."
-   echo "<b>WoWSSS</b> aliases added."
+   echo "<1>WoWSSS<0> aliases added."
 else
-   ___print_skip "<b>WoWSSS</b> not found."
+   ___print_disabled "<1>WoWSSS<0> not found."
 fi
 
 if test -f "/bin/xclip-cutfile"; then
    if test -f "$HOME/.config/ivan/git-token.txt"; then
       alias cgtk="xclip -sel clip $HOME/.config/ivan/git-token.txt && echo Token copied to the clipboard."
          cgtk_description="Copies the github security token to the clipboard."
-      ___print_info "<b>Git token</b> aliases added."
+      ___print_info "<1>Git token<0> aliases added."
    else
-      ___print_skip "<b>Git token</b> file not found."
+      ___print_disabled "<1>Git token<0> file not found."
    fi
 else
-   ___print_skip "<b>Git token</b>: <b>xclip</b> not found."
+   ___print_disabled "<1>Git token<0>: <1>xclip<0> not found."
 fi
 
 # Debian --------------------------------------------------------
@@ -335,7 +621,7 @@ function ___debian_aliases ()
         *"Ubuntu"*) os_is_ubuntu=1;;
         *"Debian"*) os_is_debian=1;;
         *"mint"*)   os_is_ubuntu=1;;
-        *) ___print_error "___debian_aliases" "Unknown linux version [<b>$osname</b>].";;
+        *) ___print_error "___debian_aliases" "Unknown linux version [<1>$osname<0>].";;
       esac
    fi
    if [ $os_is_debian -gt 0 ]; then
@@ -343,19 +629,19 @@ function ___debian_aliases ()
          poweroff_description="Poweroff system (like Ubuntu)."
       alias reboot="sudo systemctl reboot"
          reboot_description="Reboot system (like Ubuntu)."
-      ___print_info "<b>Debian power</b> aliases added."
+      ___print_info "<1>Debian power<0> aliases added."
    fi
 }
 ___debian_aliases
 
 # CC ------------------------------------------------------------
-_save_all_script="$HOME/Scripts/sh/$HOSTNAME-save-all.sh"
+_save_all_script="$_scripts_dir/$HOSTNAME-save-all.sh"
 if test -f "$_save_all_script"; then
    alias saveall="$_save_all_script"
       saveall_description="Make a backup of all meaningful configurations."
-   ___print_info "<b>Backup script</b> found."
+   ___print_info "<1>Backup script<0> found."
 else
-   ___print_skip "<b>Backup script</b> not found $_quote1$_save_all_script$_quote2."
+   ___print_disabled "<1>Backup script<0> not found $_quote1$_save_all_script$_quote2."
 fi
 
 # INAS ----------------------------------------------------------
@@ -366,25 +652,132 @@ if test -f "/etc/samba/smb.conf"; then
       smbcheck_description="Show samba service status."
    alias smbrestart="sudo service smbd restart"
       smbrestart_description="Restart samba service."
-   ___print_info "<b>Samba</b> aliases added."
+   ___print_info "<1>Samba<0> aliases added."
 else
-   ___print_skip "<b>Samba</b> not found."
+   ___print_disabled "<1>Samba<0> not found."
 fi
 
 # ---------------------------------------------------------------
 fr_description="Show memory and disk usage."
 if test -d "/shared/videoteca"; then
       alias fr="echo && free -h && echo && df -h / /shared/videoteca /shared/filter && echo"
-      ___print_info "<b>INAS-fr</b> alias added."
+      ___print_info "<1>INAS-fr<0> alias added."
 else
    if [ $HOSTNAME = "cc" ]; then
-      alias fr="echo && free -h && echo && df -h / $HOME/Dropbox $HOME/VM $HOME/store && echo"
-      ___print_info "<b>CC-fr</b> alias added."
+      alias fr="echo && free -h && echo && df -h / $HOME/Dropbox $HOME/VM $HOME/store $HOME/Games && echo"
+      ___print_info "<1>CC-fr<0> alias added."
    else
       alias fr="echo && free -h && echo && df -h / && echo"
-      ___print_info "<b>Base-fr</b> alias added."
+      ___print_info "<1>Base-fr<0> alias added."
    fi
 fi
+
+if test -f "/bin/peres"; then
+# peres Trilobite64.exe -v 2> /dev/null | awk '{print $3}' | sort -k2
+   alias exe-ver="___peres"
+      exe_ver_description="Get Windows excutable versions."
+                                                function ___peres ()
+                                                {
+                                                   local file="$1"
+                                                   if test -f "$file"; then
+                                                      peres -v "$1" 2> /dev/null | sort -k2
+                                                   else
+                                                      ___print_error "exe-ver" "File $_quote1<1>$file<0>$_quote2 not found."
+                                                   fi
+                                                }
+   ___print_info "<1>peres<0> aliases added."
+else
+   ___print_disabled "<1>peres<0> not found."
+fi
+
+
+# CC ------------------------------------------------------------
+function ___cc_aliases ()
+{
+   if [ $HOSTNAME = "cc" ]; then
+      local fname="$HOME/Dropbox/Documents/Pwds/pwds.html"
+
+      alias rmgog="rm uninst* support* webcache* && chmn"
+         rmgog_description="Remove useless GOG files."
+
+      if test -f "$fname"; then
+         alias pwds="start $fname"
+            pwds_description="Show passwords file."
+         alias epwds="q $fname"
+            epwds_description="Edit passwords file."
+      fi
+
+      local fname="$_scripts_dir/inas-mount.sh"
+
+      if test -f "$fname"; then
+         alias inas="$fname"
+            inas_description="Un/mount INAS volumes."
+         ___print_info "<1>INAS<0> mount alias added."
+      fi
+
+      alias gsave="___gsave"
+         gsave_description="Backup current active game savegames."
+      alias gsavex="gsave && x"
+         gsave_description="Backup current active game savegames and close terminal."
+      alias grestore="___grestore"
+         grestore_description="Restore current active game last savegames."
+   fi
+}
+___cc_aliases
+
+function ___gsave ()
+{
+   local bkpath="$HOME/Dropbox/Apps/Games/_savegames/Active/Valheim"
+
+   pushd . >/dev/null
+   cd "$bkpath"
+   /bin/bash backup.sh "$1"
+   popd >/dev/null
+}
+
+alias grestore2="___grestore2"
+      grestore2_description="Restore a fixed version (edit aliases)."
+function ___grestore2 ()
+{
+   local bkpath="$HOME/Dropbox/Apps/Games/_savegames/Active/Valheim/savegames"
+   local svpath="$HOME/snap/steam/common/.config/unity3d/IronGate"
+   #local filename="valheim.2025-10-12__00-15-33___before-rebuilding.7z"
+
+   if [ "$filename" == "" ]; then
+      ___print_error_bg "___grestore2" "Variable [<2>filename<0>] not set."
+      ___print_info_bg  "___grestore2" "Edit aliases file to set it up."
+      return
+   fi
+
+   cd "$svpath"
+   7z x "$bkpath/$filename"
+   cd -
+}
+
+function ___grestore ()
+{
+   local bkpath="$HOME/Dropbox/Apps/Games/_savegames/Active/Valheim/savegames"
+   local svpath="$HOME/snap/steam/common/.config/unity3d/IronGate"
+
+   local file answer
+
+   ___print_info_bg "Backups: <3>$bkpath<0>"
+   d "$bkpath"
+   file=$(ls -Art "$bkpath" | tail -n 1)
+   ___print_info_bg "Latest: <3>$file<0>"
+   echo -n " Restore this file (y/n)? "
+   read answer
+   case $answer in
+
+      "y"|"Y")  cd "$svpath"
+                7z x -y "$bkpath/$file"
+                ;;
+
+            *)  ___print_warning "Cancelled"
+                return
+                ;;
+   esac
+}
 
 # Mistakes ------------------------------------------------------
 alias car=cat
@@ -410,7 +803,7 @@ function ___editors_aliases ()
    n=${#editors_name[@]}
    q_index=1
 
-   ___print_info_start "Q-Editors: "
+   local s="Q-Editors: "
    for (( i=0 ; i<$n ; i++ ));
    do
       if test -f "${editors_file[$i]}"; then
@@ -418,9 +811,9 @@ function ___editors_aliases ()
             num=""
          else
             num=$q_index
-            ___print_info_mid ", "
+            s="$s, "
          fi
-         ___print_info_mid "$_bold1"${editors_name[$i]}$_bold0"($q_index)"
+         s="$s$_em2"${editors_name[$i]}$_em0"($_em3""q$num$_em0)"
 
          alias "q$num"="${editors_alias[$i]}"
          variable=q$num"_description"
@@ -429,7 +822,7 @@ function ___editors_aliases ()
          let q_index++
       fi
    done
-   ___print_info_end "."
+   ___print_info "$s."
 }
 ___editors_aliases
 
@@ -438,7 +831,7 @@ function ___kate()
    local pid=$(pidof kate)
    if [ "$pid" == "" ]; then
       kate
-      sleep 0.8
+      sleep 1.0
    fi
    # We don't want to see console messages anytime...
    kate "$@" > /dev/null &
@@ -481,12 +874,15 @@ function ___os_version ()
       os_version=$(lsb_release -sr)
       os_codename=$(lsb_release -sc)
       gdm_name=$XDG_CURRENT_DESKTOP
-      ___print_info "<b>$USER</b>[<b>$UID</b>]@<b>$HOSTNAME</b>"
-      ___print_info "$os_name $os_version ($os_codename) [$(uname):$OSTYPE] Kernel: $(uname -r)"
-      ___print_info  "<b>$XDG_SESSION_TYPE</b> (<b>$XDG_SESSION_DESKTOP</b>) session on $gdm_name"
+      ___print_info "System"
+      ___print_info "  <1>$os_name $os_version<0> ($os_codename) [$(uname):$OSTYPE] Kernel: <1>$(uname -r)<0>"
+      ___print_info "  Installed on $(___datetime_to_string $(stat / --format=%W))."
+      ___print_info "Session"
+      ___print_info "  <1>$USER<0>[<1>$UID<0>]@<1>$HOSTNAME<0>"
+      ___print_info "  <1>$XDG_SESSION_TYPE<0> (<1>$XDG_SESSION_DESKTOP<0>) session on $gdm_name"
 
       if [[ $gdm_name == *"GNOME"* ]]; then
-         gnome-shell --version | sed 's/^/ /'
+         gnome-shell --version | sed 's/^/   /'
       fi
       if [[ $gdm_name == *"KDE"* ]]; then
          plasmashell  --version | sed 's/^/ /'
@@ -534,9 +930,9 @@ function ___ff ()
       fi
       path=$(realpath "$path")
       if $_BLINE ; then
-         find "$path" -name "$pattern" 2>/dev/null | bline -m .Trash-1000 $_find_trash_color | bline -m $HOME $_find_home_color
+         find "$path" -name "${pattern}" 2>/dev/null | bline -m .Trash-1000 $_find_trash_color | bline -m $HOME $_find_home_color
       else
-         find "$path" -name "$pattern" 2>/dev/null
+         find "$path" -name "${pattern}" 2>/dev/null
       fi
    fi
 }
@@ -545,10 +941,9 @@ alias pdu=___pdu
    pdu_description="Progressive disk usage."
 function ___pdu ()
 {
-   local size0=
-   local size1=
-   local size=
-   local update=$3
+   local size0 size1 size mode update magn
+
+   update=$3
    if [ "$update" == "" ]; then
       update=2
    fi
@@ -561,19 +956,21 @@ function ___pdu ()
    fi
    path=$(realpath "$path")
 
-   local mode=$2
+   mode=$2
+   magn='b'
    if [ "$mode" == "" ]; then
       mode="-m"
+      magn='MB'
    fi
 
-   echo Progressive disk usage in \"$path\" "($update seconds update)":
+   ___print_info "Progressive disk usage in \"<1>$path<0>\" (<2>$update<0> seconds update):"
    # du "$path" -s "$mode"
    read size0 _ < <(du "$path" "-s" "$mode" 2> /dev/null)
 
    while true ; do
       read size1 _ < <(du "$path" "-s" "$mode" 2> /dev/null)
       let size=size1-size0
-      printf "\r   %'.3d / %'.3d " $size $size0
+      printf "\r   %s:  %'d + %'.3d" $magn $size $size0
       sleep $update
    done
 }
@@ -635,6 +1032,7 @@ ___go_dirs=("gz    :~/doom/ports/gzdoom/current" \
             "geany :~/.config/geany" \
             "xnview:~/.config/xnviewmp" \
             "conky :~/.config/conky" \
+            "val   :~/snap/steam/common/.config/unity3d/IronGate" \
            )
 function ___go_dir ()
 {
@@ -678,7 +1076,7 @@ function ___go_dir ()
             return
          fi
       done
-      ___print_error "go" "dir-id $_quote1<b>$id0</b>$_quote2 not found."
+      ___print_error "go" "dir-id $_quote1<1>$id0<0>$_quote2 not found."
    fi
 }
 
@@ -713,7 +1111,7 @@ function _desktop_link ()
 {
    if [ $# -lt 2 ]; then
       ___cmd_descr "desktop_link" "$desktop_link_description"
-      ___cmd_usage "desktop_link source-file destination-link"
+      ___cmd_usage "desktop_link full-source-file-name destination-link-only-name"
    else
       local source=$1
       local dest=$2
@@ -740,7 +1138,7 @@ function _list_aliases ()
       if [ "$cmd" != "?" ]; then
          local cmdv=${BASH_ALIASES[$cmd]}
          if [ "$cmdv" = "" ]; then
-            ___print_error "all" "Unknown alias $_quote1<b>$cmd$_quote2</b>."
+            ___print_error "all" "Unknown alias $_quote1<1>$cmd<0>$_quote2."
          else
             ___print_alias 1 0 $cmd
             return
@@ -777,7 +1175,7 @@ function _list_aliases ()
 
 function ___print_alias ()
 {
-   local desc indent cmd value suf varname c1 c2
+   local desc indent cmd cmd2 value suf varname c1 c2
 
    desc=$1
    indent=$2
@@ -804,7 +1202,9 @@ function ___print_alias ()
       fi
       echo -e -n $c2
 
-      varname=${cmd//\./_}"_description"
+      cmd2=${cmd//\./_}
+      cmd2=${cmd2//\-/_}
+      varname=$cmd2"_description"
       if [[ -v $varname ]]; then
          description=${!varname}
       else
@@ -850,7 +1250,7 @@ complete -F ___complete_all all
 # complete -W "help verbose version" all
 
 # ----------------------------------------------------------------------
-___print_info_line "<b>$_product_name $_ansi_lyellow$_product_version</b> ($_ansi_lyellow$_product_build</b>) loaded."
+___print_info_bg "[ <1>$_ilas_name<0> <2>$_ilas_version<0> (<2>$_ilas_build<0>) loaded. ]"
 # ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
@@ -863,6 +1263,4 @@ ___print_info_line "<b>$_product_name $_ansi_lyellow$_product_version</b> ($_ans
 #     done
 # }
 # ----------------------------------------------------------------------
-# System installation:
-# stat / | awk '/Birth: /{print $2 " " substr($3,1,5)}'
-#
+
