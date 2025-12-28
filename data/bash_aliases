@@ -7,8 +7,8 @@
 # ----------------------------------------------------------------------
 
 _ilas_name='Ivan Llanas Aliases System'
-_ilas_version='2.4'
-_ilas_build=126
+_ilas_version='2.7'
+_ilas_build=135
 
 # Environment vars -----------------------------------------------------
 #export LC_ALL="C" # Breaks unicode characters with ls but it's ok with eza! Does not let the prompt type accents.
@@ -482,19 +482,27 @@ alias x="exit"
    x_description="Exit shell."
 alias c="clear"
    c_description="Clear console."
-alias d="eza --group-directories-first --header --time-style=\"+%Y.%m.%d %H:%M\" --long --icons --bytes"
-   d_description="Directory listing, full information."
-alias dsz="d --total-size"
-   dsz_description="Directory listing, full information, full sizes."
+
+if test -f "/usr/bin/eza"; then
+   alias d="eza --group-directories-first --header --time-style=\"+%Y.%m.%d %H:%M\" --long --icons --bytes"
+      d_description="Directory listing, full information."
+   alias dsz="d --total-size"
+      dsz_description="Directory listing, full information, full sizes (directories)."
+   alias dg="d --git"
+      dg_description="Directory listing, full information, git status."
+   ___print_info "Using <1>eza<0> as <1>ls<0>."
+else
+   alias d="ls --group-directories-first -l"
+      d_description="Directory listing, full information."
+   ___print_disabled "<1>eza<0> not found."
+fi
 alias da="d --all"
    da_description="Directory listing, full information, all files."
-alias dg="d --git"
-   dg_description="Directory listing, full information, git status."
 alias dx="d *.exe *.EXE *.bat *.BAT 2>/dev/null"
    dx_description="Directory listing of Windows executables."
+
 alias l="less"
    l_description="Less."
-
 alias start="xdg-open"
    start_description="Launch file with the default application."
 alias fm="start ."
@@ -576,8 +584,8 @@ else
    ___print_disabled "<1>xclip<0> not found."
 fi
 
-if test -f "$HOME/doom/ports/gzdoom/current/gzdoom"; then
-   _gzdoom_dir="$HOME/doom/ports/gzdoom/current"
+if test -f "$HOME/Games/doom/ports/gzdoom/current/gzdoom"; then
+   _gzdoom_dir="$HOME/Games/doom/ports/gzdoom/current"
    alias doom="$_gzdoom_dir/gzdoom -config $_gzdoom_dir/gzdoom.ini -file"
       doom_description="Launch GZDoom with \"portable\" settings file."
    alias doomz="doom xs.pk3 bfriend1.pk3 levelinfo.pk3"
@@ -635,6 +643,9 @@ function ___debian_aliases ()
 ___debian_aliases
 
 # CC ------------------------------------------------------------
+alias freboot="sudo systemctl reboot -i"
+   freboot_description="Force reboot ignoring inhibitors via systemctl."
+
 _save_all_script="$_scripts_dir/$HOSTNAME-save-all.sh"
 if test -f "$_save_all_script"; then
    alias saveall="$_save_all_script"
@@ -664,7 +675,7 @@ if test -d "/shared/videoteca"; then
       ___print_info "<1>INAS-fr<0> alias added."
 else
    if [ $HOSTNAME = "cc" ]; then
-      alias fr="echo && free -h && echo && df -h / $HOME/Dropbox $HOME/VM $HOME/store $HOME/Games && echo"
+      alias fr="echo && free -h && echo && df -h / $HOME/Dropbox /mnt/fa200-4tb /mnt/wd100ezaz-10tb  && echo"
       ___print_info "<1>CC-fr<0> alias added."
    else
       alias fr="echo && free -h && echo && df -h / && echo"
@@ -675,7 +686,7 @@ fi
 if test -f "/bin/peres"; then
 # peres Trilobite64.exe -v 2> /dev/null | awk '{print $3}' | sort -k2
    alias exe-ver="___peres"
-      exe_ver_description="Get Windows excutable versions."
+      exe_ver_description="Get Windows executable versions."
                                                 function ___peres ()
                                                 {
                                                    local file="$1"
@@ -717,12 +728,14 @@ function ___cc_aliases ()
 
       alias gsave="___gsave"
          gsave_description="Backup current active game savegames."
-      alias gsavex="gsave && x"
-         gsave_description="Backup current active game savegames and close terminal."
+      alias gsavex="gsave && sleep 1 && exit"
+         gsavex_description="Backup current active game savegames and close terminal."
       alias grestore="___grestore"
          grestore_description="Restore current active game last savegames."
       alias GSAVE="gsave"
+         GSAVE_description="gsave caps correction."
       alias GSAVEX="gsavex"
+         GSAVEX_description="gsavex caps correction."
    fi
 }
 ___cc_aliases
@@ -752,7 +765,8 @@ function ___grestore2 ()
    fi
 
    cd "$svpath"
-   7z x "$bkpath/$filename"
+#   7z x "$bkpath/$filename"
+   rar x "$bkpath/$filename"
    cd -
 }
 
@@ -772,7 +786,8 @@ function ___grestore ()
    case $answer in
 
       "y"|"Y")  cd "$svpath"
-                7z x -y "$bkpath/$file"
+                # 7z x -y "$bkpath/$file"
+                rar x -y "$bkpath/$file"
                 ;;
 
             *)  ___print_warning "Cancelled"
@@ -876,12 +891,13 @@ function ___os_version ()
       os_version=$(lsb_release -sr)
       os_codename=$(lsb_release -sc)
       gdm_name=$XDG_CURRENT_DESKTOP
-      ___print_info "System"
-      ___print_info "  <1>$os_name $os_version<0> ($os_codename) [$(uname):$OSTYPE] Kernel: <1>$(uname -r)<0>"
-      ___print_info "  Installed on $(___datetime_to_string $(stat / --format=%W))."
-      ___print_info "Session"
-      ___print_info "  <1>$USER<0>[<1>$UID<0>]@<1>$HOSTNAME<0>"
-      ___print_info "  <1>$XDG_SESSION_TYPE<0> (<1>$XDG_SESSION_DESKTOP<0>) session on $gdm_name"
+      ___print_info $_ansi_white"System"
+      ___print_info "  <1>$os_name <2>$os_version<0> <3>$(uname -m)<0> ($os_codename) [<2>$(uname):$OSTYPE<0>] Kernel: <2>$(uname -r)<0>"
+      ___print_info "  Installed on <2>$(___datetime_to_string $(stat / --format=%W))<0>."
+      ___print_info $_ansi_white"Session"
+      os_ip=$(hostname -I 2>&1)
+      ___print_info "  <1>$USER<0>[<2>$UID<0>]@<1>$HOSTNAME<0> - <3>$os_ip<0>"
+      ___print_info "  <1>$XDG_SESSION_TYPE<0> (<2>$XDG_SESSION_DESKTOP<0>) session on <3>$gdm_name<0>"
 
       if [[ $gdm_name == *"GNOME"* ]]; then
          gnome-shell --version | sed 's/^/   /'
@@ -893,6 +909,23 @@ function ___os_version ()
    else
       ___print_info "Unknown OS version."
    fi
+
+   local shellfn shellver terminal terminalfn
+
+   ___print_info $_ansi_white"Shell"
+# cat /proc/$$/comm -> bash
+   shellfn=$(basename "$SHELL")
+   terminal=$(ps -o 'cmd=' -p $(ps -o 'ppid=' -p $$))
+   terminalfn=$(basename "$terminal")
+   case "$shellfn" in
+      "bash") shellver="$BASH_VERSION ";;
+           *) shellver="";;
+   esac
+   ___print_info "  <1>$shellfn<0> <2>$shellver<0>(<3>$SHELL<0>) on <1>$terminalfn<0> (<2>$TERM<0>)"
+
+   ___print_info $_ansi_white"Aliases"
+   ___print_info "  <1>$_ilas_name<0> <2>$_ilas_version<0> (<3>$_ilas_build<0>)"
+   echo ""
 }
 
 alias ft=___ft

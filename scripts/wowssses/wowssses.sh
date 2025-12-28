@@ -642,6 +642,7 @@ function setup_boot_logos ()
       print_info "Updating initramfs..."
       sudo update-initramfs -u
 
+      print_info "Installing gnome-control-center images..."
       # Images used in the gnome-control-center about panel
       backup_file "/usr/share/pixmaps/ubuntu-logo-text.png"
       sudo cp $path_logos/ubuntu-logo-text.png       /usr/share/pixmaps/ubuntu-logo-text.png
