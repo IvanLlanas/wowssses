@@ -1102,6 +1102,53 @@ function setup_eza ()
    CR
 }
 
+
+# ------------------------------------------------------------------------------
+# function setup_ptyxis ()
+# Installs ptyxis and/or a theme file.
+# ------------------------------------------------------------------------------
+function setup_ptyxis ()
+{
+   print_title "Install <b>Ptyxis</b> theme"
+
+   # Check if eza is installed.
+   local package="ptyxis"
+   local installed=$(_is_package_installed $package)
+   local installed_now=0
+   if [ $installed = 0 ]; then
+      print_warning "<b>$package</b> is not installed."
+      confirm 1 "Install <b>$package</b> package"
+      if [ $var_confirmed -gt 0 ]; then
+         print_info "Installing <b>$package</b>..."
+         sudo apt install -y $package | sed 's/^/    /'
+         installed=1
+         installed_now=1
+      fi
+   fi
+
+   if [ $installed -gt 0 ]; then
+      if [ $installed_now -gt 0 ]; then
+         var_confirmed=1
+      else
+         confirm 1 "Install customized <b>$package</b> theme"
+      fi
+
+      if [ $var_confirmed -gt 0 ]; then
+         local path="$HOME/.local/share/org.gnome.Ptyxis/palettes"
+         print_info "Copying <b>$package theme</b>..."
+         mkdir -p $path
+         cp $path_data/ptyxis-ivan.palette $path
+
+         local filename="$path_data/ptyxis-profiles.dconf"
+         dconf load /org/gnome/Ptyxis/Profiles/ < $filename
+      else
+         print_info $skipping_
+      fi
+   fi
+   CR
+}
+
+
 # ------------------------------------------------------------------------------
 # function setup_geany ()
 # Installs geany and/or themes and settings.
@@ -1212,6 +1259,7 @@ function main ()
    setup_user_icon
    setup_wowsss
    setup_ss
+   setup_ptyxis
    setup_eza
    setup_geany
    setup_conky

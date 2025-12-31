@@ -643,6 +643,7 @@ function ___debian_aliases ()
 ___debian_aliases
 
 # CC ------------------------------------------------------------
+# gnome-session-inhibit --list
 alias freboot="sudo systemctl reboot -i"
    freboot_description="Force reboot ignoring inhibitors via systemctl."
 
