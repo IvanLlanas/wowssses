@@ -85,4 +85,7 @@ if ! shopt -oq posix; then
   fi
 fi
 
+rmdir Music &> /dev/null
+rmdir Templates &> /dev/null
+rmdir Videos &> /dev/null
 fastfetch

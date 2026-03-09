@@ -165,7 +165,7 @@ file_type:
      background: "#200000"
      is_bold:    false
   compressed:
-     foreground: "#40a0f0"
+     foreground: "#1878d8"
      is_bold:    true
   crypto:
      foreground: "#c060ff"

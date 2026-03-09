@@ -5,10 +5,12 @@
 # Internal constants start with '_'.
 # Internal functions start with '___'.
 # ----------------------------------------------------------------------
+# 2 do:
+# $ sudo hdparm -Tt /dev/sda
 
 _ilas_name='Ivan Llanas Aliases System'
-_ilas_version='2.7'
-_ilas_build=135
+_ilas_version='2.8'
+_ilas_build=140
 
 # Environment vars -----------------------------------------------------
 #export LC_ALL="C" # Breaks unicode characters with ls but it's ok with eza! Does not let the prompt type accents.
@@ -48,6 +50,7 @@ _scripts_dir="$HOME/Scripts/sh"
 # SOFTWARE.
 
 # function ___trim (text)
+# function ___get_current_time ()
 # function ___datetime_to_string (date, [format])
 
 # function ___print_info (command, [text])
@@ -198,6 +201,13 @@ function ___trim ()
    shopt -u extglob
    # Print final result
    echo $s
+}
+
+# function ___get_current_time ()
+# Returns the current time in a number of seconds (since Jan-1 1970 00:00:00 UTC).
+function ___get_current_time ()
+{
+   echo $(date +%s)
 }
 
 # function ___datetime_to_string (date, [format])
@@ -426,6 +436,22 @@ function ___print_url ()
 }
 
 # [conio.sh]------------8<------------8<------------8<------------8<------------8<------------8<------------8<------------
+_AL_CATEGORIES=("shell" "compress" "system" "file" "app" "network")
+declare -A _AL_CATEGORY_COLORS='(
+[shell]="$_ansi_lwhite"
+[compress]="$_ansi_lcyan"
+[system]="$_ansi_lred"
+[file]="$_ansi_lyellow"
+[app]="$_ansi_lgreen"
+[network]="$_ansi_lmagenta"
+)'
+
+_CATEGORY_SHELL=${_AL_CATEGORIES[0]}
+_CATEGORY_COMPRESS=${_AL_CATEGORIES[1]}
+_CATEGORY_SYSTEM=${_AL_CATEGORIES[2]}
+_CATEGORY_FILE=${_AL_CATEGORIES[3]}
+_CATEGORY_APP=${_AL_CATEGORIES[4]}
+_CATEGORY_NETWORK=${_AL_CATEGORIES[5]}
 
 function ___cmd_descr ()
 {
@@ -455,118 +481,159 @@ fi
 # Common aliases
 alias eal="q ~/.bash_aliases"
    eal_description="Edit aliases."
+   eal_category="$_CATEGORY_SHELL"
 alias ral="unalias -a && source ~/.bash_aliases"
    ral_description="Re-read aliases."
+   ral_category="$_CATEGORY_SHELL"
 alias ..="cd .."
    ___description="Move to parent directory."
+   ___category="$_CATEGORY_SHELL"
 alias ...="cd ../.."
    ____description="Move two directories above."
+   ____category="$_CATEGORY_SHELL"
 alias ....="cd ../../.."
    _____description="Move three directories above."
+   _____category="$_CATEGORY_SHELL"
 alias .....="cd ../../../.."
    ______description="Move four directories above."
+   ______category="$_CATEGORY_SHELL"
 alias ......="cd ../../../../.."
    _______description="Move five directories above."
+   _______category="$_CATEGORY_SHELL"
+alias x="exit"
+   x_description="Exit shell."
+   x_category="$_CATEGORY_SHELL"
+alias c="clear"
+   c_description="Clear console."
+   c_category="$_CATEGORY_SHELL"
+alias clearhistory="cat /dev/null > ~/.bash_history && history -c"
+   clearhistory_description="Delete the shell history from memory and disk."
+   clearhistory_category="$_CATEGORY_SHELL"
+
+if test -f "/usr/bin/eza"; then
+   alias d="eza --group-directories-first --header --time-style=\"+%Y.%m.%d %H:%M\" --long --icons --bytes"
+      d_description="Directory listing, full information."
+      d_category="$_CATEGORY_SHELL"
+   alias dsz="d --total-size"
+      dsz_description="Directory listing, full information, full sizes (directories)."
+      dsz_category="$_CATEGORY_SHELL"
+   alias dg="d --git"
+      dg_description="Directory listing, full information, git status."
+      dg_category="$_CATEGORY_SHELL"
+   ___print_info "Using <1>eza<0> as <1>ls<0>."
+else
+   alias d="ls --group-directories-first -l"
+      d_description="Directory listing, full information."
+      d_category="$_CATEGORY_SHELL"
+   ___print_disabled "<1>eza<0> not found."
+fi
+alias da="d --all"
+   da_description="Directory listing, full information, all files."
+   da_category="$_CATEGORY_SHELL"
+alias dx="d *.exe *.EXE *.bat *.BAT 2>/dev/null"
+   dx_description="Directory listing of Windows executables."
+   dx_category="$_CATEGORY_SHELL"
+
+alias l="less"
+   l_description="Less."
+   l_category="$_CATEGORY_SHELL"
+alias start="xdg-open"
+   start_description="Launch file with the default application."
+   start_category="$_CATEGORY_SHELL"
+alias fm="start ."
+   fm_description="Start a file manager in the current directory."
+   fm_category="$_CATEGORY_SHELL"
+alias bk="rm *.bak"
+   bk_description="Delete bak files."
+   bk_category="$_CATEGORY_SHELL"
+
 alias md=mkdir
    md_description="Create a directory."
+   md_category="$_CATEGORY_FILE"
 alias rd=rmdir
    rd_description="Delete an empty directory."
+   rd_category="$_CATEGORY_FILE"
 alias mk="_mk"
    mk_description="Create a directory an enter."
+   mk_category="$_CATEGORY_FILE"
 function _mk ()
 {
    mkdir "$1"
    cd "$1"
 }
-alias x="exit"
-   x_description="Exit shell."
-alias c="clear"
-   c_description="Clear console."
 
-if test -f "/usr/bin/eza"; then
-   alias d="eza --group-directories-first --header --time-style=\"+%Y.%m.%d %H:%M\" --long --icons --bytes"
-      d_description="Directory listing, full information."
-   alias dsz="d --total-size"
-      dsz_description="Directory listing, full information, full sizes (directories)."
-   alias dg="d --git"
-      dg_description="Directory listing, full information, git status."
-   ___print_info "Using <1>eza<0> as <1>ls<0>."
-else
-   alias d="ls --group-directories-first -l"
-      d_description="Directory listing, full information."
-   ___print_disabled "<1>eza<0> not found."
-fi
-alias da="d --all"
-   da_description="Directory listing, full information, all files."
-alias dx="d *.exe *.EXE *.bat *.BAT 2>/dev/null"
-   dx_description="Directory listing of Windows executables."
-
-alias l="less"
-   l_description="Less."
-alias start="xdg-open"
-   start_description="Launch file with the default application."
-alias fm="start ."
-   fm_description="Start a file manager in the current directory."
-alias bk="rm *.bak"
-   bk_description="Delete bak files."
 alias ra="rar a -r -s -m5 -md1g"
    ra_description="Compress using rar with maximum compression settings."
+   ra_category="$_CATEGORY_COMPRESS"
 alias rl="rar l"
    rl_description="List rar archive contents."
+   rl_category="$_CATEGORY_COMPRESS"
 alias rx="rar x"
    rx_description="Extract archive contents."
+   rx_category="$_CATEGORY_COMPRESS"
 alias 7za="7z a -t7z -mx=9"
    _7za_description="Compress using 7z with maximum compression settings."
+   _7za_category="$_CATEGORY_COMPRESS"
 alias supdate="sudo apt update && apt list --upgradable"
    supdate_description="Check packages to update."
+   supdate_category="$_CATEGORY_SYSTEM"
 alias supgrade="sudo apt upgrade -y"
    supgrade_description="Update the current packages."
+   supgrade_category="$_CATEGORY_SYSTEM"
 alias sysupdate="supdate && supgrade"
    sysupdate_description="Update everything. No questions."
-alias clearhistory="cat /dev/null > ~/.bash_history && history -c"
-   clearhistory_description="Delete the shell history from memory and disk."
-alias bat="upower -i /org/freedesktop/UPower/devices/battery_BAT0"
-   bat_description="Show battery status."
+   sysupdate_category="$_CATEGORY_SYSTEM"
 alias fstab="sudo nano /etc/fstab"
    fstab_description="Edit /etc/fstab using nano."
+   fstab_category="$_CATEGORY_SYSTEM"
 
 if $_BLINE ; then
    alias mnt="mount | awk -F' ' '{ printf \"%s\t%s\n\",\$1,\$3; }' | column -t | egrep ^/dev/ | sort | bline -m $HOME $_find_home_color"
 else
    alias mnt="mount | awk -F' ' '{ printf \"%s\t%s\n\",\$1,\$3; }' | column -t | egrep ^/dev/ | sort"
 fi
-
    mnt_description="Show device mounts."
+   mnt_category="$_CATEGORY_SYSTEM"
+
 alias mnts="mount | awk -F' ' '{ printf \"%s\t%s\n\",\$1,\$3; }' | column -t | egrep ^/var/ | sort"
    mnts_description="Show snap mounts."
+   mnts_category="$_CATEGORY_SYSTEM"
 
 alias logout="gnome-session-quit --no-prompt"
    logout_description="Logout desktop session (no confirmation!)."
+   logout_category="$_CATEGORY_SYSTEM"
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 # and in 10sec an alert will popup into Gnome alerts (calendar button).
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
    alert_description="Add an alert to Gnome alerts (calendar button)."
+   alert_category="$_CATEGORY_SHELL"
 
 alias fn="realpath \$1"
    fn_description="Print the full path of a given file/directory."
+   fn_category="$_CATEGORY_FILE"
 
 # Saved from original .bashrc
 alias grep="grep --color=auto"
    grep_description="grep using colors."
+   grep_category="$_CATEGORY_FILE"
 alias egrep="egrep --color=auto"
    egrep_description="egrep using colors."
+   egrep_category="$_CATEGORY_FILE"
 alias fgrep="fgrep --color=auto"
    fgrep_description="fgrep using colors."
+   fgrep_category="$_CATEGORY_FILE"
 
 # Apps ----------------------------------------------------------
 if test -f "/bin/cmatrix"; then
    alias matrix="gnome-terminal --window-with-profile=Matrix --full-screen -- cmatrix -b"
       matrix_description="Start full Matrix screensaver."
+      matrix_category="$_CATEGORY_SHELL"
    # kmatrix - Mind the single quote!
    alias kmatrix='kill $(pidof cmatrix)'
       kmatrix_description="Kill Matrix screensaver (if Q does not quit)."
+      kmatrix_category="$_CATEGORY_SHELL"
    ___print_info "<1>cmatrix<0> aliases added."
 else
    ___print_disabled "<1>cmatrix<0> not found."
@@ -575,11 +642,14 @@ fi
 if test -f "/bin/xclip-cutfile"; then
    alias xc=xclip-copyfile
       xc_description="Copy file(s) to the clipboard (only to console!)."
+      xc_category="$_CATEGORY_SHELL"
    alias xx=xclip-cutfile
       xx_description="Cut file(s) to the clipboard (only to console!)."
+      xx_category="$_CATEGORY_SHELL"
    alias xv=xclip-pastefile
       xv_description="Paste file(s) from the clipboard (only from console!)."
-   ___print_info "<1>xclip<0> aliases added."
+      xv_category="$_CATEGORY_SHELL"
+___print_info "<1>xclip<0> aliases added."
 else
    ___print_disabled "<1>xclip<0> not found."
 fi
@@ -588,8 +658,10 @@ if test -f "$HOME/Games/doom/ports/gzdoom/current/gzdoom"; then
    _gzdoom_dir="$HOME/Games/doom/ports/gzdoom/current"
    alias doom="$_gzdoom_dir/gzdoom -config $_gzdoom_dir/gzdoom.ini -file"
       doom_description="Launch GZDoom with \"portable\" settings file."
+      doom_category="$_CATEGORY_APP"
    alias doomz="doom xs.pk3 bfriend1.pk3 levelinfo.pk3"
       doomz_description="Launch GZDoom with \"portable\" settings file and XS wad(s)."
+      doomz_category="$_CATEGORY_APP"
    ___print_info "<1>GZDoom<0> aliases added."
 else
    ___print_disabled "<1>GZDoom<0> not found."
@@ -598,6 +670,7 @@ fi
 if test -f "$HOME/wowsss/wowsss/wowsss.sh"; then
    alias wow="$HOME/wowsss/start.sh"
       wow_description="Launch WoWSSS."
+      wow_category="$_CATEGORY_APP"
    echo "<1>WoWSSS<0> aliases added."
 else
    ___print_disabled "<1>WoWSSS<0> not found."
@@ -607,6 +680,7 @@ if test -f "/bin/xclip-cutfile"; then
    if test -f "$HOME/.config/ivan/git-token.txt"; then
       alias cgtk="xclip -sel clip $HOME/.config/ivan/git-token.txt && echo Token copied to the clipboard."
          cgtk_description="Copies the github security token to the clipboard."
+         cgtk_category="$_CATEGORY_APP"
       ___print_info "<1>Git token<0> aliases added."
    else
       ___print_disabled "<1>Git token<0> file not found."
@@ -635,8 +709,10 @@ function ___debian_aliases ()
    if [ $os_is_debian -gt 0 ]; then
       alias poweroff="sudo systemctl poweroff"
          poweroff_description="Poweroff system (like Ubuntu)."
+         poweroff_category="$_CATEGORY_SYSTEM"
       alias reboot="sudo systemctl reboot"
          reboot_description="Reboot system (like Ubuntu)."
+         reboot_category="$_CATEGORY_SYSTEM"
       ___print_info "<1>Debian power<0> aliases added."
    fi
 }
@@ -644,13 +720,26 @@ ___debian_aliases
 
 # CC ------------------------------------------------------------
 # gnome-session-inhibit --list
-alias freboot="sudo systemctl reboot -i"
-   freboot_description="Force reboot ignoring inhibitors via systemctl."
+alias powerofff="sudo systemctl poweroff -i"
+   powerofff_description="Force poweroff ignoring inhibitors via systemctl."
+   powerofff_category="$_CATEGORY_SYSTEM"
+alias poweroffi="___poweroffi"
+   poweroffi_description="Try to poweroff every 2 seconds."
+   poweroffi_category="$_CATEGORY_SYSTEM"
+
+function ___poweroffi ()
+{
+   while true ; do
+      poweroff
+      sleep 2
+   done
+}
 
 _save_all_script="$_scripts_dir/$HOSTNAME-save-all.sh"
 if test -f "$_save_all_script"; then
    alias saveall="$_save_all_script"
       saveall_description="Make a backup of all meaningful configurations."
+      saveall_category="$_CATEGORY_SHELL"
    ___print_info "<1>Backup script<0> found."
 else
    ___print_disabled "<1>Backup script<0> not found $_quote1$_save_all_script$_quote2."
@@ -660,17 +749,25 @@ fi
 if test -f "/etc/samba/smb.conf"; then
    alias smbed="sudo nano /etc/samba/smb.conf"
       smbed_description="Edit samba configuration file."
+      smbed_category="$_CATEGORY_APP"
    alias smbcheck="sudo systemctl status smbd"
       smbcheck_description="Show samba service status."
+      smbcheck_category="$_CATEGORY_APP"
    alias smbrestart="sudo service smbd restart"
       smbrestart_description="Restart samba service."
+      smbrestart_category="$_CATEGORY_APP"
    ___print_info "<1>Samba<0> aliases added."
 else
    ___print_disabled "<1>Samba<0> not found."
 fi
 
 # ---------------------------------------------------------------
+alias bat="upower -i /org/freedesktop/UPower/devices/battery_BAT0"
+   bat_description="Show battery status."
+   bat_category="$_CATEGORY_SYSTEM"
+
 fr_description="Show memory and disk usage."
+fr_category="$_CATEGORY_SYSTEM"
 if test -d "/shared/videoteca"; then
       alias fr="echo && free -h && echo && df -h / /shared/videoteca /shared/filter && echo"
       ___print_info "<1>INAS-fr<0> alias added."
@@ -688,6 +785,7 @@ if test -f "/bin/peres"; then
 # peres Trilobite64.exe -v 2> /dev/null | awk '{print $3}' | sort -k2
    alias exe-ver="___peres"
       exe_ver_description="Get Windows executable versions."
+      exe_ver_category="$_CATEGORY_FILE"
                                                 function ___peres ()
                                                 {
                                                    local file="$1"
@@ -709,14 +807,17 @@ function ___cc_aliases ()
    if [ $HOSTNAME = "cc" ]; then
       local fname="$HOME/Dropbox/Documents/Pwds/pwds.html"
 
-      alias rmgog="rm uninst* support* webcache* && chmn"
+      alias rmgog="rm unins* support* webcache* && chmn"
          rmgog_description="Remove useless GOG files."
+         rmgog_category="$_CATEGORY_FILE"
 
       if test -f "$fname"; then
          alias pwds="start $fname"
             pwds_description="Show passwords file."
+            pwds_category="$_CATEGORY_FILE"
          alias epwds="q $fname"
             epwds_description="Edit passwords file."
+            epwds_category="$_CATEGORY_FILE"
       fi
 
       local fname="$_scripts_dir/inas-mount.sh"
@@ -724,19 +825,28 @@ function ___cc_aliases ()
       if test -f "$fname"; then
          alias inas="$fname"
             inas_description="Un/mount INAS volumes."
+            inas_category="$_CATEGORY_NETWORK"
          ___print_info "<1>INAS<0> mount alias added."
       fi
 
       alias gsave="___gsave"
          gsave_description="Backup current active game savegames."
+         gsave_category="$_CATEGORY_APP"
       alias gsavex="gsave && sleep 1 && exit"
          gsavex_description="Backup current active game savegames and close terminal."
+         gsavex_category="$_CATEGORY_APP"
       alias grestore="___grestore"
          grestore_description="Restore current active game last savegames."
+         grestore_category="$_CATEGORY_APP"
       alias GSAVE="gsave"
          GSAVE_description="gsave caps correction."
+         GSAVE_category="$_CATEGORY_APP"
       alias GSAVEX="gsavex"
          GSAVEX_description="gsavex caps correction."
+         GSAVEX_category="$_CATEGORY_APP"
+      alias grestore2="___grestore2"
+         grestore2_description="Restore a fixed version (edit aliases to configure!)."
+         grestore2_category="$_CATEGORY_APP"
    fi
 }
 ___cc_aliases
@@ -751,8 +861,6 @@ function ___gsave ()
    popd >/dev/null
 }
 
-alias grestore2="___grestore2"
-      grestore2_description="Restore a fixed version (edit aliases)."
 function ___grestore2 ()
 {
    local bkpath="$HOME/Dropbox/Apps/Games/00-savegames/Active/Valheim/savegames"
@@ -800,8 +908,10 @@ function ___grestore ()
 # Mistakes ------------------------------------------------------
 alias car=cat
    car_description="cat (correction)."
+   car_category="$_CATEGORY_SHELL"
 alias cay=cat
    cay_description=$car_description
+   cay_category="$_CATEGORY_SHELL"
 
 # ---------------------------------------------------------------
 # Big aliases ---------------------------------------------------
@@ -837,6 +947,9 @@ function ___editors_aliases ()
          variable=q$num"_description"
          let num2=q_index-1
          eval ${variable}=${editors_pref[$num2]}"\ text\ editor\ \("${editors_name[$i]}"\)."
+         variable=q$num"_category"
+         eval ${variable}="$_CATEGORY_SHELL"
+
          let q_index++
       fi
    done
@@ -856,9 +969,11 @@ function ___kate()
 }
 alias sq="sudo nano"
    sq_description="sudo nano."
+   sq_category="$_CATEGORY_SHELL"
 
 alias fh="___fh"
    fh_description="Find in history."
+   fh_category="$_CATEGORY_SHELL"
 function ___fh ()
 {
    if [ $# -lt 1 ]; then
@@ -871,6 +986,7 @@ function ___fh ()
 
 alias fp="___fp"
    fp_description="Find pid of a given process name."
+   fp_category="$_CATEGORY_SYSTEM"
 function ___fp ()
 {
    if [ $# -lt 1 ]; then
@@ -883,18 +999,61 @@ function ___fp ()
 
 alias ver=___os_version
    ver_description="Show OS version information."
+   ver_category="$_CATEGORY_SYSTEM"
+
+      function ___elapsed_date_to_string ()
+      {
+         local seconds y m d result empty
+         seconds=$1
+         empty=1
+         result=
+
+         # Years ----
+         y=$(($seconds / 31536000))
+         seconds=$(($seconds - $((y * 31536000))))
+         if [ $y -gt 0 ]; then
+            result="$y years"
+            empty=0
+         fi
+         # Months ----
+         m=$(($seconds / 2592000))
+         seconds=$(($seconds - $((m * 2592000))))
+         if [ $m -gt 0 ]; then
+            if [ $empty -eq 0 ]; then
+               result="$result, "
+            fi
+            result="$result$m months"
+            empty=0
+         fi
+         # Days ----
+         d=$(($seconds / 86400))
+         if [ $d -gt 0 ]; then
+            if [ $empty -eq 0 ]; then
+               result="$result, "
+            fi
+            result="$result$d days"
+            empty=0
+         fi
+         echo "$result"
+      # -u avoid converting this time to local timezone.
+      # echo $(date -u -d@$1 +%H:%M:%S)
+      }
+
 function ___os_version ()
 {
    if type lsb_release >/dev/null 2>&1; then
       # Get OS info from lsb_release
-      local os_name os_version os_codename gdm_name
+      local os_name os_version os_codename gdm_name seconds1 seconds2
       os_name=$(lsb_release -si)
       os_version=$(lsb_release -sr)
       os_codename=$(lsb_release -sc)
       gdm_name=$XDG_CURRENT_DESKTOP
       ___print_info $_ansi_white"System"
       ___print_info "  <1>$os_name <2>$os_version<0> <3>$(uname -m)<0> ($os_codename) [<2>$(uname):$OSTYPE<0>] Kernel: <2>$(uname -r)<0>"
-      ___print_info "  Installed on <2>$(___datetime_to_string $(stat / --format=%W))<0>."
+      seconds1=$(stat / --format=%W)
+      seconds2=$(___get_current_time)
+      ___print_info "  Installed on <2>$(___datetime_to_string $(stat / --format=%W))<0> [<3>$(___elapsed_date_to_string $(($seconds2 - $seconds1)))<0>]"
+
       ___print_info $_ansi_white"Session"
       os_ip=$(hostname -I 2>&1)
       ___print_info "  <1>$USER<0>[<2>$UID<0>]@<1>$HOSTNAME<0> - <3>$os_ip<0>"
@@ -931,6 +1090,7 @@ function ___os_version ()
 
 alias ft=___ft
    ft_description="Find text inside files (ignore case, recursive and line numbers)."
+   ft_category="$_CATEGORY_FILE"
 function ___ft ()
 {
    if [ $# -lt 1 ]; then
@@ -953,6 +1113,7 @@ function ___ft ()
 
 alias ff=___ff
    ff_description="Find files."
+   ff_category="$_CATEGORY_FILE"
 function ___ff ()
 {
    if [ $# -lt 1 ]; then
@@ -975,6 +1136,7 @@ function ___ff ()
 
 alias pdu=___pdu
    pdu_description="Progressive disk usage."
+   pdu_category="$_CATEGORY_SYSTEM"
 function ___pdu ()
 {
    local size0 size1 size mode update magn
@@ -1013,6 +1175,7 @@ function ___pdu ()
 
 alias count=___count_files
    count_description="Count the amount of files and directories recursively in a given path."
+   count_category="$_CATEGORY_FILE"
 function ___count_files ()
 {
    if [ $# -lt 1 ]; then
@@ -1034,8 +1197,10 @@ function ___count_files ()
 
 alias chm=___chm
    chm_description="Change file permissions recursively."
+   chm_category="$_CATEGORY_FILE"
 alias chmn="chm 644"
    chmn_description="Change file permissions to 664 recursively."
+   chmn_category="$_CATEGORY_FILE"
 function ___chm ()
 {
    if [ $# -lt 1 ]; then
@@ -1053,6 +1218,7 @@ function ___chm ()
 
 alias go=___go_dir
    go_description="cd shortcuts by ID."
+   go_category="$_CATEGORY_SHELL"
 ___go_dirs=("gz    :~/doom/ports/gzdoom/current" \
             "wad   :~/doom/wads" \
             "docs  :~/Dropbox/Documents" \
@@ -1143,6 +1309,7 @@ complete -F ___complete_go go
 
 alias desktop_link=_desktop_link
    desktop_link_description="Create an absolute symbolic link in the desktop to the specified file."
+   desktop_link_category="$_CATEGORY_FILE"
 function _desktop_link ()
 {
    if [ $# -lt 2 ]; then
@@ -1157,44 +1324,56 @@ function _desktop_link ()
 
 alias all=_list_aliases
    all_description="Show a list of aliases".
+   all_category="$_CATEGORY_SHELL"
 function _list_aliases ()
 {
-   local aliases desc width2 i cmd cr
+   local aliases str show_descr the_category i cmd cr ncmd
+
+   ncmd=$COLUMNS
+   let ncmd=ncmd-3
+   let ncmd=ncmd/16
 
    aliases=$(compgen -a)
-   desc=0
+   show_descr=0
    i=1
    cr=0
 
-   let width2=$COLUMNS-3
-   let n=width2/16
-
+   the_category=""
    if [[ $1 != "" ]]; then
+
       cmd=$1
-      if [ "$cmd" != "?" ]; then
-         local cmdv=${BASH_ALIASES[$cmd]}
-         if [ "$cmdv" = "" ]; then
-            ___print_error "all" "Unknown alias $_quote1<1>$cmd<0>$_quote2."
-         else
-            ___print_alias 1 0 $cmd
-            return
+      for str in ${_AL_CATEGORIES[@]}; do
+         if [ "$str" = "$cmd" ]; then
+            the_category="$str"
+         fi
+      done
+
+      if [ "$the_category" = "" ]; then
+         if [ "$cmd" != "?" ]; then
+            str=${BASH_ALIASES[$cmd]}
+            if [ "$str" = "" ]; then
+               ___print_error "all" "Unknown alias $_quote1<1>$cmd<0>$_quote2."
+            else
+               ___print_alias 1 0 $cmd
+               return
+            fi
          fi
       fi
-      desc=1
+      show_descr=1
    fi
 
-   if [ $desc -eq 0 ]; then
+   if [ $show_descr -eq 0 ]; then
       printf "   "
    fi
 
    while IFS= read -r cmd ; do
 
-      ___print_alias $desc 1 $cmd
+      ___print_alias $show_descr 1 $cmd $the_category
 
       cr=0
-      if [ $desc = 0 ]; then
+      if [ $show_descr = 0 ]; then
          let i=i+1
-         if [ $i -ge $n ]; then
+         if [ $i -gt $ncmd ]; then
             printf "\n   "
             i=1
             cr=1
@@ -1203,7 +1382,7 @@ function _list_aliases ()
 
    done <<< "$aliases"
 
-   if [ $desc -eq 0 ] && [ $cr -eq 0 ]; then
+   if [ $show_descr -eq 0 ] && [ $cr -eq 0 ]; then
       echo
    fi
    echo
@@ -1211,36 +1390,59 @@ function _list_aliases ()
 
 function ___print_alias ()
 {
-   local desc indent cmd cmd2 value suf varname c1 c2
+   local show_descr do_indent cmd only_categ base value suf varname description category c1 c2
 
-   desc=$1
-   indent=$2
+   show_descr=$1
+   do_indent=$2
    cmd=$3
+   only_categ=$4
 
    value=${BASH_ALIASES[$cmd]}
    if [[ $value == *"sudo "* ]]; then
       suf="*"
-      c1="\e[93m"
-      c2="\e[0m"
+      c1="$_ansi_lyellow"
+      c2="$_ansi_off"
    else
       suf=""
       c1=
       c2=
    fi
 
-   if [ $desc -gt 0 ]; then
+   if [ $show_descr -gt 0 ]; then
+
+      # varname root (cmd)
+      base=${cmd//\./_}
+      base=${base//\-/_}
+
+      varname=$base"_category"
+      if [[ -v $varname ]]; then
+         category=${!varname}
+      else
+         varname="_"$varname
+         if [[ -v $varname ]]; then
+            category=${!varname}
+         else
+            category="?"
+         fi
+      fi
+
+      if [ "$only_categ" != "" ]; then
+         if [ "$only_categ" != "$category" ]; then
+            return
+         fi
+      fi
+
       printf "   "
       echo -e -n $c1
-      if [ $indent -gt 0 ]; then
+      if [ $do_indent -gt 0 ]; then
          printf %-16s $cmd$suf
       else
          printf %s $cmd$suf
       fi
       echo -e -n $c2
 
-      cmd2=${cmd//\./_}
-      cmd2=${cmd2//\-/_}
-      varname=$cmd2"_description"
+
+      varname=$base"_description"
       if [[ -v $varname ]]; then
          description=${!varname}
       else
@@ -1251,7 +1453,9 @@ function ___print_alias ()
             description="?"
          fi
       fi
-      echo " - $description"
+
+      c1=${_AL_CATEGORY_COLORS[$category]}
+      echo -e " - [$c1$category$_ansi_off] $description"
    else
       echo -e -n $c1
       printf %-16s $cmd$suf

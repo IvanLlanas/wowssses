@@ -1139,6 +1139,7 @@ function setup_ptyxis ()
          mkdir -p $path
          cp $path_data/ptyxis-ivan.palette $path
 
+#dconf write /org/gnome/Ptyxis/Profiles/eaac8e4e95a45ba0ede574da695104cf/opacity 0.85
          local filename="$path_data/ptyxis-profiles.dconf"
          dconf load /org/gnome/Ptyxis/Profiles/ < $filename
       else
