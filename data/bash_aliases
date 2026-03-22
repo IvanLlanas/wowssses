@@ -10,7 +10,7 @@
 
 _ilas_name='Ivan Llanas Aliases System'
 _ilas_version='2.8'
-_ilas_build=140
+_ilas_build=145
 
 # Environment vars -----------------------------------------------------
 #export LC_ALL="C" # Breaks unicode characters with ls but it's ok with eza! Does not let the prompt type accents.
@@ -517,6 +517,9 @@ if test -f "/usr/bin/eza"; then
    alias dsz="d --total-size"
       dsz_description="Directory listing, full information, full sizes (directories)."
       dsz_category="$_CATEGORY_SHELL"
+   alias dasz="da --total-size"
+      dsz_description="Directory listing, all files, full information, full sizes (directories)."
+      dsz_category="$_CATEGORY_SHELL"
    alias dg="d --git"
       dg_description="Directory listing, full information, git status."
       dg_category="$_CATEGORY_SHELL"
@@ -583,6 +586,9 @@ alias supgrade="sudo apt upgrade -y"
 alias sysupdate="supdate && supgrade"
    sysupdate_description="Update everything. No questions."
    sysupdate_category="$_CATEGORY_SYSTEM"
+alias appupdate="flatpak update"
+   appupdate_description="Update flatpak applications."
+   appupdate_category="$_CATEGORY_SYSTEM"
 alias fstab="sudo nano /etc/fstab"
    fstab_description="Edit /etc/fstab using nano."
    fstab_category="$_CATEGORY_SYSTEM"
@@ -844,15 +850,17 @@ function ___cc_aliases ()
       alias GSAVEX="gsavex"
          GSAVEX_description="gsavex caps correction."
          GSAVEX_category="$_CATEGORY_APP"
-      alias grestore2="___grestore2"
-         grestore2_description="Restore a fixed version (edit aliases to configure!)."
-         grestore2_category="$_CATEGORY_APP"
+
+      alias sshpi="ssh wow@192.168.1.106"
+         sshpi_description="Connect via ssh with wow-server."
+         sshpi_category="$__CATEGORY_NETWORK"
    fi
 }
 ___cc_aliases
 
 function ___gsave ()
 {
+#  local bkpath="$HOME/Dropbox/Apps/Games/00-savegames/Active/Core Keeper"
    local bkpath="$HOME/Dropbox/Apps/Games/00-savegames/Active/Valheim"
 
    pushd . >/dev/null
@@ -861,26 +869,10 @@ function ___gsave ()
    popd >/dev/null
 }
 
-function ___grestore2 ()
-{
-   local bkpath="$HOME/Dropbox/Apps/Games/00-savegames/Active/Valheim/savegames"
-   local svpath="$HOME/snap/steam/common/.config/unity3d/IronGate"
-   #local filename="valheim.2025-10-12__00-15-33___before-rebuilding.7z"
-
-   if [ "$filename" == "" ]; then
-      ___print_error_bg "___grestore2" "Variable [<2>filename<0>] not set."
-      ___print_info_bg  "___grestore2" "Edit aliases file to set it up."
-      return
-   fi
-
-   cd "$svpath"
-#   7z x "$bkpath/$filename"
-   rar x "$bkpath/$filename"
-   cd -
-}
-
 function ___grestore ()
 {
+#  local bkpath="$HOME/Dropbox/Apps/Games/00-savegames/Active/Core Keeper/savegames"
+#  local svpath="$HOME/snap/steam/common/.local/share/Steam/steamapps/compatdata/1621690/pfx/drive_c/users/steamuser/AppData/LocalLow/Pugstorm/Core Keeper/Steam/12240012"
    local bkpath="$HOME/Dropbox/Apps/Games/00-savegames/Active/Valheim/savegames"
    local svpath="$HOME/snap/steam/common/.config/unity3d/IronGate"
 
@@ -904,6 +896,25 @@ function ___grestore ()
                 ;;
    esac
 }
+
+
+# Network ------------------------------------------------------
+alias extconn="netstat -ano | grep ESTABLISHED | grep -v \":443 \" | grep -v \":80 \" | grep -v \"127.0.0.1:\""
+   extconn_description="List active external connections."
+   extconn_category="$_CATEGORY_NETWORK"
+alias iplookup="___iplookup"
+   iplookup_description="Open a web browser showing information of the given IP address."
+   iplookup_category="$_CATEGORY_NETWORK"
+function ___iplookup ()
+{
+   if [ $# -lt 1 ]; then
+      ___cmd_descr "iplookup" "$iplookup_description"
+      ___cmd_usage "iplookup ip"
+   else
+      start https://whatismyipaddress.com/ip/$1
+   fi
+}
+
 
 # Mistakes ------------------------------------------------------
 alias car=cat
